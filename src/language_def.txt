@@ -1,0 +1,81 @@
+Dominio
+
+Desarrollar un lenguaje que permita definir y analizar variables, fórmulas y conectivos del lenguaje proposicional, aprendido durante la cursada de la materia de Lógica Computacional [93.35]. El lenguaje debe permitir crear variables y valuaciones a partir de ellas, crear conectivos nuevos (de cualquier aridad, no sólo binarios) y crear fórmulas a partir de las variables y conectivos definidos (o los tradicionales).
+Se proveerán funciones para analizar tanto las fórmulas (su valor de verdad, si es tautología, contradicción o contingencia, su cantidad de conectivos, congruencias semánticas, etc.), como los conectivos en sí (si un conjunto de ellos es adecuado). La salida de estos resultados se genera en un archivo .tex, el cual se puede ver en cualquier visualizador de LaTeX.
+
+Construcciones
+
+El lenguaje desarrollado debería ofrecer las siguientes construcciones, prestaciones y funcionalidades relacionados a la lógica proposicional:
+
+Se podrán definir variables de la lógica proposicional.
+Se podrán definir valuaciones a partir de un conjunto de variables, asignándole valores de verdad a cada una (true o false).
+Se podrán definir conectivos a partir de conectivos ya existentes, o mediante una tabla de verdad. Los conectivos podrán tener cualquier aridad.
+Se podrán definir fórmulas a partir de las variables, fórmulas y conectivos previamente definidos, también utilizando los conectivos “tradicionales” (AND, OR, NOT, THEN, IFF). 
+Se podrá evaluar si una fórmula es satisfacible o no, y en el caso de que no lo sea, determinar si se trata de una tautología o una contingencia.
+Se podrá convertir una fórmula en CNF (Conjunctive Normal Form) usando el formato de entrada del SAT4J Solver, para poder utilizar el mismo.
+Se podrá evaluar el valor de verdad de una fórmula a partir de una valuación adecuada a la misma (análisis de una valuación).
+Se podrá obtener todas las valuaciones que satisfacen a una fórmula.
+Se podrán evaluar dos fórmulas para determinar si son semánticamente congruentes.
+Se podrán definir conjuntos de conectivos, utilizando conectivos definidos previamente o conectivos “tradicionales”.
+Se podrá determinar si un conjunto de conectivos es adecuado.
+Se podrá determinar la complejidad y la complejidad binaria de una fórmula.
+Casos de Prueba
+
+Se proponen los siguientes casos iniciales de prueba de aceptación:
+Un programa que defina variables, y una valuación a partir de ellas.
+Un programa que defina los conectivos NAND y XOR mediante el uso de conectivos tradicionales, y mediante la tabla de verdad.
+Un programa que evalúe dos fórmulas semánticamente congruentes correctamente.
+Un programa que devuelva correctamente todas las valuaciones que satisfacen una fórmula 
+Un programa que defina conectivos que forman un conjunto de conectivos adecuados, y luego se evalúe correctamente dicha propiedad.
+Un programa que evalúe correctamente la complejidad y complejidad binaria de una fórmula.
+Un programa que defina una fórmula a partir de otras fórmulas previamente definidas (anidamiento de fórmulas).
+Un programa que, dadas una fórmula satisfacible y otra insatisfacible, evalúe estas propiedades correctamente.
+Un programa que, dadas dos fórmulas satisfacibles, una tautológica y la otra contingente, evalúe estas propiedades correctamente.
+Un programa que defina un conjunto de variables, una valuación a partir de ellas, una fórmula que utilice dichas variables, y que finalmente realice un análisis de valuación correcto. 
+
+Además, los siguientes casos de prueba de rechazo:
+Un programa malformado.
+Un programa que intente hacer un análisis de valuación a partir de una fórmula y una valuación que no corresponda a la misma (distintas variables, por ejemplo).
+Un programa que cree una valuación a partir de variables inexistentes.
+Un programa que cree una fórmula a partir de fórmulas inexistentes.
+Un programa que cree una fórmula con cantidad incorrecta de paréntesis.
+Un programa que cree conectivos a partir de una tabla de verdad incompleta.
+
+Ejemplos
+
+Crear dos fórmulas, una utilizando a la otra (anidamiento). Además, se crea una valuación y se realiza un análisis de valuación utilizando la segunda fórmula.
+
+// Definición de tres variables (se puede definir de a una o de a varias):
+define variable p;
+define variable q, s;
+
+// Definición de dos fórmulas, la segunda utilizando la primera:
+define formula myForm1 = (p AND (NOT q));
+define formula myForm2 = ({myForm1} OR (s THEN q));
+
+// Definición de una valuación:
+define valuation myVal =  { p = true, q = true, s = false };
+
+// Evaluación e impresión del resultado de la misma. Imprime por consola: “myForm2 tiene un valor de TRUE al ser evaluada con myVal”.
+evaluate(myForm2, myVal);
+
+
+Crear el conectivo XOR mediante la tabla de verdad, y un conjunto de conectivos que utilice al mismo. Luego se analiza si es adecuado el conjunto.
+
+// Crear un conectivo nuevo (XOR) usando una tabla de verdad:
+define operator XOR(x, y) = {
+    (true,  true)  -> false;
+    (true,  false) -> true;
+    (false, true)  -> true;
+    (false, false) -> false;
+};
+
+// Crear un conectivo a partir de conectivos ya existentes:
+define operator myOp(x, y, z) = (NOT ((x AND y) OR z));
+
+// Definir un conjunto de conectivos, utilizando algunos tradicionales y los definidos anteriormente.
+define opset myOperators = {THEN, myOp, XOR, NOT};
+
+// Evaluar si el conjunto de conectivos es adecuado. Imprime por consola: “El conjunto de conectivos myOperators es ADECUADO”
+adequate(myOperators);
+
