@@ -8,7 +8,7 @@
 
 %union {
     /** Terminals. */
-    int integer;          // Para valores enteros como TRUE (1) y FALSE (0).
+    char truth_val;      // Para valores booleanos (TRUE o FALSE).
     Token token;          // Para tokens generales.
 
     /** Non-terminals. */
@@ -57,8 +57,8 @@
 %token <token> IDENTIFIER
 %token <token> EQUALS OPEN_BRACE CLOSE_BRACE OPEN_PARENTHESIS CLOSE_PARENTHESIS COMMA SEMICOLON ARROW WILDCARD DOLLAR
 %token <token> UNKNOWN
-%token <integer> TRUE "true"
-%token <integer> FALSE "false"
+%token <truth_val> TRUE
+%token <truth_val> FALSE
 
 /** Non-terminals. */
 %type <program> program
