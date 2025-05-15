@@ -15,8 +15,8 @@
     Program *program;     // Representa el programa completo.
     Statement *statement; // Representa una declaración individual.
     Expression *expression; // Representa una expresión lógica o aritmética.
+	VariableList *variableList; // Lista de variables.
     ValuationList *valuationList; // Lista de valuaciones.
-    ParameterList *parameterList; // Lista de parámetros para operadores.
     TruthTable *truthTable; // Tabla de verdad para operadores.
     TruthTableEntry *truthTableEntry; // Entrada individual de una tabla de verdad.
     TruthValues *truthValues; // Lista de valores de verdad en una entrada de tabla.
@@ -26,6 +26,7 @@
     DefineVariable *defineVariable; // Declaración de variables.
     DefineFormula *defineFormula; // Declaración de fórmulas.
     DefineValuation *defineValuation; // Declaración de valuaciones.
+	CustomOperator *customOperator; // Estructura de un operador personalizado.
     DefineOperator *defineOperator; // Declaración de operadores.
     DefineOpset *defineOpset; // Declaración de conjuntos de operadores.
     EvaluateStatement *evaluateStatement; // Evaluación de una fórmula.
@@ -60,8 +61,8 @@
 %type <program> program
 %type <expression> expression
 %type <statement> statement
+%type <variableList> variableList
 %type <valuationList> valuationList
-%type <parameterList> parameterList
 %type <truthTable> truthTable
 %type <truthTableEntry> truthTableEntry
 %type <truthValues> truthValues
@@ -75,6 +76,7 @@
 %type <defineOpset> defineOpset
 %type <evaluateStatement> evaluateStatement
 %type <adequateStatement> adequateStatement
+%type <customOperator> customOperator
 
 /**
  * Precedence and associativity.
@@ -103,8 +105,7 @@ statement: defineVariable											{ $$ = DefineVariableStatementSemanticAction
 	| adequateStatement 											{ $$ = AdequateStatementSemanticAction($1); }
 	;
 
-defineVariable: DEFINE VARIABLE IDENTIFIER 							{ $$ = DefineVariableAction($3); }
-	| DEFINE VARIABLE IDENTIFIER COMMA IDENTIFIER 					{ $$ = DefineMultipleVariablesAction($3, $5); }
+defineVariable: DEFINE VARIABLE variableList SEMICOLON			    { $$ = DefineVariableAction($3); }
 	;
 
 defineFormula: DEFINE FORMULA IDENTIFIER EQUALS expression 			{ $$ = DefineFormulaAction($3, $5); }
@@ -113,16 +114,18 @@ defineFormula: DEFINE FORMULA IDENTIFIER EQUALS expression 			{ $$ = DefineFormu
 defineValuation: DEFINE VALUATION IDENTIFIER EQUALS OPEN_BRACE valuationList CLOSE_BRACE 										{ $$ = DefineValuationAction($3, $6); }
 	;
 
+variableList: IDENTIFIER 											{ $$ = VariableListSingleAction($1); }
+	| variableList COMMA IDENTIFIER 								{ $$ = VariableListMultipleAction($1, $3); }
+	;
+
 valuationList: IDENTIFIER EQUALS truthValue 						{ $$ = ValuationListSingleAction($1, $3); }
 	| valuationList COMMA IDENTIFIER EQUALS truthValue 				{ $$ = ValuationListMultipleAction($1, $3, $5); }
 	;
 
-defineOperator: DEFINE OPERATOR IDENTIFIER OPEN_PARENTHESIS parameterList CLOSE_PARENTHESIS EQUALS expression 					{ $$ = DefineOperatorAction($3, $5, $8); }
-	| DEFINE OPERATOR IDENTIFIER OPEN_PARENTHESIS parameterList CLOSE_PARENTHESIS EQUALS OPEN_BRACE truthTable CLOSE_BRACE 		{ $$ = DefineOperatorWithTruthTableAction($3, $5, $9); }
+defineOperator: DEFINE OPERATOR customOperator EQUALS OPEN_BRACE truthTable CLOSE_BRACE 		{ $$ = DefineOperatorWithTruthTableAction($3, $6); }
 	;
 
-parameterList: IDENTIFIER 											{ $$ = ParameterListSingleAction($1); }
-	| parameterList COMMA IDENTIFIER 								{ $$ = ParameterListMultipleAction($1, $3); }
+customOperator: IDENTIFIER OPEN_PARENTHESIS variableList CLOSE_PARENTHESIS     	{ $$ = DefineCustomOperatorAction($3); }
 	;
 
 truthTable: truthTableEntry 										{ $$ = TruthTableSingleAction($1); }
@@ -152,20 +155,20 @@ opsetList: IDENTIFIER 												{ $$ = OpsetListSingleAction($1); }
 	| opsetList COMMA IDENTIFIER 									{ $$ = OpsetListMultipleAction($1, $3); }
 	;
 
-evaluateStatement: EVALUATE OPEN_PARENTHESIS IDENTIFIER COMMA IDENTIFIER CLOSE_PARENTHESIS 										{ $$ = EvaluateFormulaAction($3, $5); }
+evaluateStatement: EVALUATE OPEN_PARENTHESIS IDENTIFIER COMMA IDENTIFIER CLOSE_PARENTHESIS SEMICOLON			{ $$ = EvaluateFormulaAction($3, $5); }
 	;
 
-adequateStatement: ADEQUATE OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS														{ $$ = CheckAdequacyAction($3); }
+adequateStatement: ADEQUATE OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS SEMICOLON					{ $$ = CheckAdequacyAction($3); }
 	;
 
-expression: expression[left] AND expression[right] 				    { $$ = LogicalExpressionSemanticAction($left, $right, AND); }
-    | expression[left] OR expression[right]  						{ $$ = LogicalExpressionSemanticAction($left, $right, OR); }
-    | expression[left] THEN expression[right] 						{ $$ = LogicalExpressionSemanticAction($left, $right, THEN); }
-    | expression[left] IFF expression[right] 						{ $$ = LogicalExpressionSemanticAction($left, $right, IFF); }
-    | NOT expression 												{ $$ = NotExpressionSemanticAction($2); }
-    | OPEN_PARENTHESIS expression CLOSE_PARENTHESIS 				{ $$ = ParenthesizedExpressionSemanticAction($2); }
-	| DOLLAR OPEN_BRACE IDENTIFIER CLOSE_BRACE 						{ $$ = PredefinedFormulaExpressionSemanticAction($3); }
-    | IDENTIFIER			 										{ $$ = IdentifierExpressionSemanticAction($1); }
+expression: OPEN_PARENTHESIS expression[left] AND expression[right] CLOSE_PARENTHESIS			    { $$ = LogicalExpressionSemanticAction($left, $right, AND); }
+    | OPEN_PARENTHESIS expression[left] OR expression[right] CLOSE_PARENTHESIS 						{ $$ = LogicalExpressionSemanticAction($left, $right, OR); }
+    | OPEN_PARENTHESIS expression[left] THEN expression[right] CLOSE_PARENTHESIS					{ $$ = LogicalExpressionSemanticAction($left, $right, THEN); }
+    | OPEN_PARENTHESIS expression[left] IFF expression[right] CLOSE_PARENTHESIS						{ $$ = LogicalExpressionSemanticAction($left, $right, IFF); }
+    | NOT expression 																				{ $$ = NotExpressionSemanticAction($2); }
+	| DOLLAR OPEN_BRACE IDENTIFIER CLOSE_BRACE 														{ $$ = PredefinedFormulaExpressionSemanticAction($3); }
+    | IDENTIFIER																					{ $$ = IdentifierExpressionSemanticAction($1); }
+	| customOperator																				{ $$ = CustomOperatorExpressionSemanticAction(); }	 																		
     ;
 
 %%
