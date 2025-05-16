@@ -1,1 +1,1 @@
-3 - 2
+DEFINE FORMULA myForm = (p & q);

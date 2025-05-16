@@ -101,7 +101,7 @@
 
 program: program statement SEMICOLON								{ $$ = ProgramStatementSemanticAction(currentCompilerState(), $1, $2); }
 	| statement SEMICOLON											{ $$ = ProgramStatementSemanticAction(currentCompilerState(), NULL, $1); }
-	| %empty
+	| %empty														{ $$ = ProgramStatementSemanticAction(currentCompilerState(), NULL, NULL); }
 	;
 
 statement: defineVariable											{ $$ = DefineVariableStatementSemanticAction($1); }
@@ -174,7 +174,7 @@ adequateStatement: ADEQUATE OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS SEMICO
 
 expression: binaryExpression																		{ $$ = BinaryTypeAction($1); }
 	| customExpression																				{ $$ = CustomTypeAction($1); }
-    | notExpression 																				{ $$ = NotTypeAction($2); }
+    | notExpression 																				{ $$ = NotTypeAction($1); }
     | IDENTIFIER																					{ $$ = VariableTypeAction($1); }
     ;
 
