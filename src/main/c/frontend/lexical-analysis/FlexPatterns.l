@@ -31,7 +31,6 @@
 <MULTILINE_COMMENT>[^*]+			{ IgnoredLexemeAction(createLexicalAnalyzerContext()); }
 <MULTILINE_COMMENT>.				{ IgnoredLexemeAction(createLexicalAnalyzerContext()); }
 
-// Palabras clave
 "define"                            { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), DEFINE); }
 "variable"                          { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), VARIABLE); }
 "formula"                           { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), FORMULA); }
@@ -44,17 +43,14 @@
 "true"                              { return BooleanSemanticValueLexemeAction(createLexicalAnalyzerContext(), true); }
 "false"                             { return BooleanSemanticValueLexemeAction(createLexicalAnalyzerContext(), false); }
 
-// Conectivos
 "&"                                 { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), AND); }
 "|"                                 { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), OR); }
 "!"                                 { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), NOT); }
 "=>"                                { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), THEN); }
 "<=>"                               { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), IFF); }
 
-// Identificadores
 [a-zA-Z_][a-zA-Z0-9_]*              { return LiteralSemanticValueLexemeAction(createLexicalAnalyzerContext(), IDENTIFIER); }
 
-// Símbolos
 "="                                 { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), EQUALS); }
 "$"                                 { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), DOLLAR); }
 "?"                                 { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), WILDCARD); }
@@ -66,10 +62,8 @@
 ";"                                 { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), SEMICOLON); }
 "->"                                { return TokenSemanticValueLexemeAction(createLexicalAnalyzerContext(), ARROW); }
 
-// Espacios en blanco
 [[:space:]]+                        { IgnoredLexemeAction(createLexicalAnalyzerContext()); }
 
-// Cualquier otro carácter
 .                                   { return UnknownLexemeAction(createLexicalAnalyzerContext()); }
 
 %%

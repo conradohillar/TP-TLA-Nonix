@@ -100,7 +100,6 @@
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 
 program: program statement SEMICOLON								{ $$ = ProgramStatementSemanticAction(currentCompilerState(), $1, $2); }
-	| statement SEMICOLON											{ $$ = ProgramStatementSemanticAction(currentCompilerState(), NULL, $1); }
 	| %empty														{ $$ = ProgramStatementSemanticAction(currentCompilerState(), NULL, NULL); }
 	;
 
@@ -113,7 +112,7 @@ statement: defineVariable											{ $$ = DefineVariableStatementSemanticAction
 	| adequateStatement 											{ $$ = AdequateStatementSemanticAction($1); }
 	;
 
-defineVariable: DEFINE VARIABLE variableList SEMICOLON			    { $$ = DefineVariableAction($3); }
+defineVariable: DEFINE VARIABLE variableList			    		{ $$ = DefineVariableAction($3); }
 	;
 
 defineFormula: DEFINE FORMULA IDENTIFIER EQUALS expression 			{ $$ = DefineFormulaAction($3, $5); }
