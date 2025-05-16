@@ -51,7 +51,8 @@ TruthTableEntry * TruthTableMapperEntryAction(TruthValueList * truthValueList, b
 TruthTableEntry * TruthTableOtherwiseEntryAction(boolean otherwiseValue) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	TruthTableEntry * truthTableEntry = calloc(1, sizeof(TruthTableEntry));
-	truthTableEntry->otherwiseValue = otherwiseValue;
+	TruthValue * otherwiseValue = calloc(1, sizeof(TruthValue));
+	truthTableEntry->otherwiseValue->value = otherwiseValue; //TODO: chequear esto
 	truthTableEntry->type = OTHERWISE;
 	return truthTableEntry;
 }
