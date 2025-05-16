@@ -53,10 +53,10 @@ typedef struct AdequateStatement AdequateStatement;
 typedef struct EvaluateStatement EvaluateStatement;
 
 typedef struct TruthTable TruthTable;
-typedef struct TruthTableEntryList TruthTableEntryList;
 typedef struct TruthTableEntry TruthTableEntry;
 typedef struct TruthValueList TruthValueList;
 typedef struct TruthValueOrWildcard TruthValueOrWildcard;
+typedef struct TruthValue TruthValue;
 
 /**
  * Node types for the Abstract Syntax Tree (AST).
@@ -104,7 +104,7 @@ struct Expression {
 		NotExpression * notExpression;
 		BinaryExpression * binaryExpression;
 		CustomExpression * customExpression;
-		Variable * variable;
+		Variable variable;
 	};
 	ExpressionType type;
 };
@@ -116,12 +116,12 @@ struct NotExpression {
 struct BinaryExpression {
 	Expression * leftExpression;
 	Expression * rightExpression;
-	BinaryOperatorType operator;
+	BinaryOperatorType operatorType;
 };
 
 struct CustomExpression {
 	union {
-		PredefinedFormula * predefinedFormula;
+		PredefinedFormula predefinedFormula;
 		CustomOperator * customOperator;
 	};
 	CustomExpressionType type;
@@ -162,7 +162,7 @@ struct ValuationList {
 
 struct Valuation {
 	Variable * variable;
-	boolean value;
+	TruthValue * truthValue;
 };
 
 //OPSET
@@ -191,35 +191,35 @@ struct EvaluateStatement {
 
 //TRUTH TABLE
 struct TruthTable {
-	TruthTableEntryList * entryList;
-};
-
-struct TruthTableEntryList {
 	TruthTableEntry * entry;
-	TruthTableEntryList * next;
+	TruthTable * next;
 };
 
 struct TruthTableEntry {
 	union {
 		struct {
 			TruthValueList * truthValueList;
-			boolean mapValue; // Boolean to which the truth values list is mapped.
+			TruthValue * mapValue; // Boolean to which the truth values list is mapped.
 		}; // TRUTH_VALUE_LIST
-		boolean otherwiseValue; // OTHERWISE
+		TruthValue * otherwiseValue; // OTHERWISE
 	};
 	TruthTableEntryType type;
 };
 
 struct TruthValueList {
-	TruthValueOrWildcard truthValueOrWildcard;
+	TruthValueOrWildcard * truthValueOrWildcard;
 	TruthValueList * next;
 };
 
 struct TruthValueOrWildcard {
-	boolean truthValue;
+	TruthValue * truthValue;
 	// We do not need to store the wildcard value as it has no inherent value. 
 	// Its existance is defined by the TruthValueWithWildcardType identifier.
 	TruthValueOrWildcardType type;
+};
+
+struct TruthValue {
+	boolean value;
 };
 
 
@@ -283,7 +283,6 @@ void releaseEvaluateStatement(EvaluateStatement * evaluateStatement);
 
 void releaseTruthTable(TruthTable * truthTable);
 void releaseTruthTableEntry(TruthTableEntry * truthTableEntry);
-void releaseTruthTableEntryList(TruthTableEntryList * truthTableEntryList);
 void releaseTruthValueList(TruthValueList * truthValueList);
 void releaseTruthValueOrWildcard(TruthValueOrWildcard * truthValueOrWildcard);
 

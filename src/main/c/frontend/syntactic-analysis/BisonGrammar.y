@@ -15,13 +15,17 @@
     Program *program;     // Representa el programa completo.
     Statement *statement; // Representa una declaración individual.
     Expression *expression; // Representa una expresión lógica o aritmética.
+	BinaryExpression *binaryExpression; // Expresión binaria (AND, OR, etc.).
+	CustomExpression *customExpression; // Expresión personalizada.
+	NotExpression *notExpression; // Expresión NOT.
 	VariableList *variableList; // Lista de variables.
     ValuationList *valuationList; // Lista de valuaciones.
+	Valuation *valuation; // Representa una valuación individual.
     TruthTable *truthTable; // Tabla de verdad para operadores.
     TruthTableEntry *truthTableEntry; // Entrada individual de una tabla de verdad.
     TruthValues *truthValues; // Lista de valores de verdad en una entrada de tabla.
     TruthValue *truthValue; // Valor de verdad individual (TRUE o FALSE).
-	TruthValueWildcard *truthValueWildcard; // Valor de verdad con comodín.
+	TruthValueOrWildcard *truthValueOrWildcard; // Valor de verdad con comodín.
     OpsetList *opsetList; // Lista de conectivos en un conjunto de operadores.
     DefineVariable *defineVariable; // Declaración de variables.
     DefineFormula *defineFormula; // Declaración de fórmulas.
@@ -60,14 +64,18 @@
 /** Non-terminals. */
 %type <program> program
 %type <expression> expression
+%type <binaryExpression> binaryExpression
+%type <customExpression> customExpression
+%type <notExpression> notExpression
 %type <statement> statement
 %type <variableList> variableList
 %type <valuationList> valuationList
+%type <valuation> valuation
 %type <truthTable> truthTable
 %type <truthTableEntry> truthTableEntry
 %type <truthValues> truthValues
 %type <truthValue> truthValue
-%type <truthValueWildcard> truthValueWildcard
+%type <truthValueOrWildcard> truthValueOrWildcard
 %type <opsetList> opsetList
 %type <defineVariable> defineVariable
 %type <defineFormula> defineFormula
@@ -91,8 +99,8 @@
 
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 
-program: program statement SEMICOLON								{ $$ = ProgramStatementSemanticAction($1, $2); }
-	| statement SEMICOLON											{ $$ = SingleStatementProgramSemanticAction($1); }
+program: program statement SEMICOLON								{ $$ = ProgramStatementSemanticAction(currentCompilerState(), $1, $2); }
+	| statement SEMICOLON											{ $$ = ProgramStatementSemanticAction(currentCompilerState(), NULL, $1); }
 	| %empty
 	;
 
@@ -111,48 +119,51 @@ defineVariable: DEFINE VARIABLE variableList SEMICOLON			    { $$ = DefineVariab
 defineFormula: DEFINE FORMULA IDENTIFIER EQUALS expression 			{ $$ = DefineFormulaAction($3, $5); }
 	;
 
-defineValuation: DEFINE VALUATION IDENTIFIER EQUALS OPEN_BRACE valuationList CLOSE_BRACE 										{ $$ = DefineValuationAction($3, $6); }
+defineValuation: DEFINE VALUATION IDENTIFIER EQUALS OPEN_BRACE valuationList CLOSE_BRACE 			{ $$ = DefineValuationAction($3, $6); }
 	;
 
-variableList: IDENTIFIER 											{ $$ = VariableListSingleAction($1); }
-	| variableList COMMA IDENTIFIER 								{ $$ = VariableListMultipleAction($1, $3); }
+variableList: IDENTIFIER 											{ $$ = VariableListAction(NULL, $1); }
+	| variableList COMMA IDENTIFIER 								{ $$ = VariableListAction($1, $3); }
 	;
 
-valuationList: IDENTIFIER EQUALS truthValue 						{ $$ = ValuationListSingleAction($1, $3); }
-	| valuationList COMMA IDENTIFIER EQUALS truthValue 				{ $$ = ValuationListMultipleAction($1, $3, $5); }
+valuationList: valuation 											{ $$ = ValuationListAction(NULL, $1); }
+	| valuationList COMMA valuation 								{ $$ = ValuationListAction($1, $3); }
 	;
 
-defineOperator: DEFINE OPERATOR customOperator EQUALS OPEN_BRACE truthTable CLOSE_BRACE 		{ $$ = DefineOperatorWithTruthTableAction($3, $6); }
+valuation: IDENTIFIER EQUALS truthValue								{ $$ = ValuationAction($1, $3); }
+	;
+
+defineOperator: DEFINE OPERATOR customOperator EQUALS OPEN_BRACE truthTable CLOSE_BRACE 		{ $$ = DefineOperatorAction($3, $6); }
 	;
 
 customOperator: IDENTIFIER OPEN_PARENTHESIS variableList CLOSE_PARENTHESIS     	{ $$ = DefineCustomOperatorAction($3); }
 	;
 
-truthTable: truthTableEntry 										{ $$ = TruthTableSingleAction($1); }
-	| truthTable truthTableEntry 									{ $$ = TruthTableMultipleAction($1, $2); }
+truthTable: truthTableEntry 										{ $$ = TruthTableAction(NULL, $1); }
+	| truthTable truthTableEntry 									{ $$ = TruthTableAction($1, $2); }
 	;
 
-truthTableEntry: OPEN_PARENTHESIS truthValues CLOSE_PARENTHESIS ARROW truthValue SEMICOLON										{ $$ = TruthTableEntryAction($2, $5); }
-	| truthValue OTHERWISE SEMICOLON 								{ $$ = TruthTableEntryAction($1); }
+truthTableEntry: OPEN_PARENTHESIS truthValues CLOSE_PARENTHESIS ARROW truthValue SEMICOLON			{ $$ = TruthTableMapperEntryAction($2, $5); }
+	| truthValue OTHERWISE SEMICOLON 																{ $$ = TruthTableOtherwiseEntryAction($1); }
 	;
 
-truthValues: truthValueWildcard 									{ $$ = TruthValuesSingleAction($1); }
-	| truthValues COMMA truthValueWildcard 							{ $$ = TruthValuesMultipleAction($1, $3); }
+truthValues: truthValueOrWildcard 									{ $$ = TruthValueListAction(NULL, $1); }
+	| truthValues COMMA truthValueOrWildcard 						{ $$ = TruthValueListAction($1, $3); }
 	;
 
-truthValueWildcard: WILDCARD 										{ $$ = WildcardSemanticAction(); }
-    | truthValue 													{ $$ = TruthValueWildcardAction($1); }
+truthValueOrWildcard: WILDCARD 										{ $$ = WildcardTypeAction(); }
+    | truthValue 													{ $$ = TruthValueTypeAction($1); }
     ;
 
 truthValue: TRUE 													{ $$ = TruthValueAction(true); }
     | FALSE      													{ $$ = TruthValueAction(false); }
     ;
 
-defineOpset: DEFINE OPSET IDENTIFIER EQUALS OPEN_BRACE opsetList CLOSE_BRACE 													{ $$ = DefineOpsetAction($3, $6); }
+defineOpset: DEFINE OPSET IDENTIFIER EQUALS OPEN_BRACE opsetList CLOSE_BRACE 		{ $$ = DefineOpsetAction($3, $6); }
 	;
 
-opsetList: IDENTIFIER 												{ $$ = OpsetListSingleAction($1); }
-	| opsetList COMMA IDENTIFIER 									{ $$ = OpsetListMultipleAction($1, $3); }
+opsetList: IDENTIFIER 												{ $$ = OpsetListAction(NULL, $1); }
+	| opsetList COMMA IDENTIFIER 									{ $$ = OpsetListAction($1, $3); }
 	;
 
 evaluateStatement: EVALUATE OPEN_PARENTHESIS IDENTIFIER COMMA IDENTIFIER CLOSE_PARENTHESIS SEMICOLON			{ $$ = EvaluateFormulaAction($3, $5); }
@@ -161,14 +172,23 @@ evaluateStatement: EVALUATE OPEN_PARENTHESIS IDENTIFIER COMMA IDENTIFIER CLOSE_P
 adequateStatement: ADEQUATE OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS SEMICOLON					{ $$ = CheckAdequacyAction($3); }
 	;
 
-expression: OPEN_PARENTHESIS expression[left] AND expression[right] CLOSE_PARENTHESIS			    { $$ = LogicalExpressionSemanticAction($left, $right, AND); }
-    | OPEN_PARENTHESIS expression[left] OR expression[right] CLOSE_PARENTHESIS 						{ $$ = LogicalExpressionSemanticAction($left, $right, OR); }
-    | OPEN_PARENTHESIS expression[left] THEN expression[right] CLOSE_PARENTHESIS					{ $$ = LogicalExpressionSemanticAction($left, $right, THEN); }
-    | OPEN_PARENTHESIS expression[left] IFF expression[right] CLOSE_PARENTHESIS						{ $$ = LogicalExpressionSemanticAction($left, $right, IFF); }
-    | NOT expression 																				{ $$ = NotExpressionSemanticAction($2); }
-	| DOLLAR OPEN_BRACE IDENTIFIER CLOSE_BRACE 														{ $$ = PredefinedFormulaExpressionSemanticAction($3); }
-    | IDENTIFIER																					{ $$ = IdentifierExpressionSemanticAction($1); }
-	| customOperator																				{ $$ = CustomOperatorExpressionSemanticAction(); }	 																		
+expression: binaryExpression																		{ $$ = BinaryTypeAction($1); }
+	| customExpression																				{ $$ = CustomTypeAction($1); }
+    | notExpression 																				{ $$ = NotTypeAction($2); }
+    | IDENTIFIER																					{ $$ = VariableTypeAction($1); }
     ;
+
+binaryExpression: OPEN_PARENTHESIS expression[left] AND expression[right] CLOSE_PARENTHESIS	    	{ $$ = BinaryExpressionSemanticAction($left, $right, AND); }
+    | OPEN_PARENTHESIS expression[left] OR expression[right] CLOSE_PARENTHESIS 						{ $$ = BinaryExpressionSemanticAction($left, $right, OR); }
+    | OPEN_PARENTHESIS expression[left] THEN expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, THEN); }
+    | OPEN_PARENTHESIS expression[left] IFF expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, IFF); }
+    ;
+
+customExpression: DOLLAR OPEN_BRACE IDENTIFIER CLOSE_BRACE 											{ $$ = PredefinedFormulaSemanticAction($3); }
+	| customOperator																				{ $$ = CustomOperatorSemanticAction($1); }	 																		
+	;
+
+notExpression: NOT expression 																		{ $$ = NotExpressionSemanticAction($2); }
+	;
 
 %%
