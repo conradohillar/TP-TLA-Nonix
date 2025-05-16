@@ -285,5 +285,6 @@ void releaseTruthTable(TruthTable * truthTable);
 void releaseTruthTableEntry(TruthTableEntry * truthTableEntry);
 void releaseTruthValueList(TruthValueList * truthValueList);
 void releaseTruthValueOrWildcard(TruthValueOrWildcard * truthValueOrWildcard);
+void releaseTruthValue(TruthValue * truthValue);
 
 #endif
