@@ -1,1 +1,1 @@
-define formula myForm = (p & q);
+define formula myForm = ((p | (!p & q)) & ((p | !q) | !(p & q)));

@@ -1,1 +1,1 @@
-define valuation myVal2 = { p = true, q = false};
+define valuation myVal2 = { p = true, q = false, r = false, s = false};
