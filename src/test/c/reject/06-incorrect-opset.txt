@@ -1,0 +1,1 @@
+define opset myOpset = { =, myOp1, => };

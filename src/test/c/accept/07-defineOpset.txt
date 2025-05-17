@@ -1,1 +1,1 @@
-define opset myOpset = {myOp1, &, myOp2, myOp3, |, !, <=>, => };
+define opset myOpset = {myOp1, &, myOp2, myOp3, |, !, <=>, =>, myOp4};
