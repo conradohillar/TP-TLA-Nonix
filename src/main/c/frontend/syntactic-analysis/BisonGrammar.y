@@ -1,6 +1,7 @@
 %{
 #include "BisonActions.h"
 #include "AbstractSyntaxTree.h"
+#include "../../shared/Type.h"
 %}
 
 // You touch this, and you die.
@@ -8,8 +9,8 @@
 
 %union {
     /** Terminals. */
-    char truth_val;      // Para valores booleanos (TRUE o FALSE).
-    Token token;          // Para tokens generales.
+    boolean truth_value;     // Para valores booleanos (TRUE o FALSE).
+    const char * keywordOrSymbol;       // Para tokens generales.
 
     /** Non-terminals. */
     Program *program;     // Representa el programa completo.
@@ -23,7 +24,7 @@
 	Valuation *valuation; // Representa una valuación individual.
     TruthTable *truthTable; // Tabla de verdad para operadores.
     TruthTableEntry *truthTableEntry; // Entrada individual de una tabla de verdad.
-    TruthValues *truthValues; // Lista de valores de verdad en una entrada de tabla.
+    TruthValueList *truthValueList; // Lista de valores de verdad en una entrada de tabla.
     TruthValue *truthValue; // Valor de verdad individual (TRUE o FALSE).
 	TruthValueOrWildcard *truthValueOrWildcard; // Valor de verdad con comodín.
     OpsetList *opsetList; // Lista de conectivos en un conjunto de operadores.
@@ -53,13 +54,13 @@
 */
 
 /** Terminals. */
-%token <token> DEFINE VARIABLE FORMULA VALUATION OPERATOR OPSET EVALUATE ADEQUATE OTHERWISE
-%token <token> AND OR THEN IFF NOT
-%token <token> IDENTIFIER
-%token <token> EQUALS OPEN_BRACE CLOSE_BRACE OPEN_PARENTHESIS CLOSE_PARENTHESIS COMMA SEMICOLON ARROW WILDCARD DOLLAR
-%token <truth_val> TRUE
-%token <truth_val> FALSE
-%token <token> UNKNOWN
+%token <keywordOrSymbol> DEFINE VARIABLE FORMULA VALUATION OPERATOR OPSET EVALUATE ADEQUATE OTHERWISE
+%token <keywordOrSymbol> AND OR THEN IFF NOT
+%token <keywordOrSymbol> IDENTIFIER
+%token <keywordOrSymbol> EQUALS OPEN_BRACE CLOSE_BRACE OPEN_PARENTHESIS CLOSE_PARENTHESIS COMMA SEMICOLON ARROW WILDCARD DOLLAR
+%token <truth_value> TRUE
+%token <truth_value> FALSE
+%token <keywordOrSymbol> UNKNOWN
 
 /** Non-terminals. */
 %type <program> program
@@ -73,7 +74,7 @@
 %type <valuation> valuation
 %type <truthTable> truthTable
 %type <truthTableEntry> truthTableEntry
-%type <truthValues> truthValues
+%type <truthValueList> truthValueList
 %type <truthValue> truthValue
 %type <truthValueOrWildcard> truthValueOrWildcard
 %type <opsetList> opsetList
@@ -135,19 +136,19 @@ valuation: IDENTIFIER EQUALS truthValue								{ $$ = ValuationAction($1, $3); }
 defineOperator: DEFINE OPERATOR customOperator EQUALS OPEN_BRACE truthTable CLOSE_BRACE 		{ $$ = DefineOperatorAction($3, $6); }
 	;
 
-customOperator: IDENTIFIER OPEN_PARENTHESIS variableList CLOSE_PARENTHESIS     	{ $$ = DefineCustomOperatorAction($3); }
+customOperator: IDENTIFIER OPEN_PARENTHESIS variableList CLOSE_PARENTHESIS     	{ $$ = DefineCustomOperatorAction($1, $3); }
 	;
 
 truthTable: truthTableEntry 										{ $$ = TruthTableAction(NULL, $1); }
 	| truthTable truthTableEntry 									{ $$ = TruthTableAction($1, $2); }
 	;
 
-truthTableEntry: OPEN_PARENTHESIS truthValues CLOSE_PARENTHESIS ARROW truthValue SEMICOLON			{ $$ = TruthTableMapperEntryAction($2, $5); }
-	| truthValue OTHERWISE SEMICOLON 																{ $$ = TruthTableOtherwiseEntryAction($1); }
+truthTableEntry: OPEN_PARENTHESIS truthValueList CLOSE_PARENTHESIS ARROW truthValue SEMICOLON			{ $$ = TruthTableMapperEntryAction($2, $5); }
+	| truthValue OTHERWISE SEMICOLON 																	{ $$ = TruthTableOtherwiseEntryAction($1); }
 	;
 
-truthValues: truthValueOrWildcard 									{ $$ = TruthValueListAction(NULL, $1); }
-	| truthValues COMMA truthValueOrWildcard 						{ $$ = TruthValueListAction($1, $3); }
+truthValueList: truthValueOrWildcard 								{ $$ = TruthValueListAction(NULL, $1); }
+	| truthValueList COMMA truthValueOrWildcard 					{ $$ = TruthValueListAction($1, $3); }
 	;
 
 truthValueOrWildcard: WILDCARD 										{ $$ = WildcardTypeAction(); }
@@ -177,10 +178,10 @@ expression: binaryExpression																		{ $$ = BinaryTypeAction($1); }
     | IDENTIFIER																					{ $$ = VariableTypeAction($1); }
     ;
 
-binaryExpression: OPEN_PARENTHESIS expression[left] AND expression[right] CLOSE_PARENTHESIS	    	{ $$ = BinaryExpressionSemanticAction($left, $right, AND); }
-    | OPEN_PARENTHESIS expression[left] OR expression[right] CLOSE_PARENTHESIS 						{ $$ = BinaryExpressionSemanticAction($left, $right, OR); }
-    | OPEN_PARENTHESIS expression[left] THEN expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, THEN); }
-    | OPEN_PARENTHESIS expression[left] IFF expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, IFF); }
+binaryExpression: OPEN_PARENTHESIS expression[left] AND expression[right] CLOSE_PARENTHESIS	    	{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_AND); }
+    | OPEN_PARENTHESIS expression[left] OR expression[right] CLOSE_PARENTHESIS 						{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_OR); }
+    | OPEN_PARENTHESIS expression[left] THEN expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_THEN); }
+    | OPEN_PARENTHESIS expression[left] IFF expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_IFF); }
     ;
 
 customExpression: DOLLAR OPEN_BRACE IDENTIFIER CLOSE_BRACE 											{ $$ = PredefinedFormulaSemanticAction($3); }

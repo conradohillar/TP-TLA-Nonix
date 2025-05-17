@@ -32,10 +32,10 @@ typedef struct CustomExpression CustomExpression;
 
 typedef struct DefineVariable DefineVariable;
 typedef struct VariableList VariableList;
-typedef char * Variable;
+typedef const char * Variable;
 
 typedef struct DefineFormula DefineFormula;
-typedef char * PredefinedFormula;
+typedef const char * PredefinedFormula;
 
 typedef struct DefineValuation DefineValuation;
 typedef struct ValuationList ValuationList;
@@ -43,7 +43,7 @@ typedef struct Valuation Valuation;
 
 typedef struct DefineOpset DefineOpset;
 typedef struct OpsetList OpsetList;
-typedef char * Operator;
+typedef const char * Operator;
 
 typedef struct DefineOperator DefineOperator;
 typedef struct BinaryOperator BinaryOperator;
@@ -70,10 +70,10 @@ typedef struct TruthValue TruthValue;
 };
 
 enum BinaryOperatorType {
-	AND,
-	OR,
-	THEN,
-	IFF
+	BINOP_AND,
+	BINOP_OR,
+	BINOP_THEN,
+	BINOP_IFF
 };
 
 enum CustomExpressionType {
@@ -83,17 +83,17 @@ enum CustomExpressionType {
 
 enum TruthTableEntryType {
 	TRUTH_VALUE_LIST,
-	OTHERWISE
+	OTHERWISE_ENTRY
 };
 
 enum TruthValueOrWildcardType {
 	TRUTH_VALUE,
-	WILDCARD
+	WILDCARD_VALUE
 };
 
 // FORMULA
 struct DefineFormula {
-	char * name;
+	const char * name;
 	Expression * expression;
 };
 
@@ -135,7 +135,7 @@ struct DefineOperator {
 };
 
 struct CustomOperator {
-	char * name;
+	const char * name;
 	VariableList * variableList;
 };
 
@@ -151,7 +151,7 @@ struct VariableList {
 
 // VALUATION
 struct DefineValuation {
-	char * name;
+	const char * name;
 	ValuationList * valuationList;
 };
 
@@ -161,13 +161,13 @@ struct ValuationList {
 };
 
 struct Valuation {
-	Variable * variable;
+	Variable variable;
 	TruthValue * truthValue;
 };
 
 //OPSET
 struct DefineOpset {
-	char * name;
+	const char * name;
 	OpsetList * opsetList;
 };
 
@@ -179,14 +179,14 @@ struct OpsetList {
 
 // ADEQUACY
 struct AdequateStatement {
-	char * opsetName;
+	const char * opsetName;
 };
 
 
 // EVALUATION
 struct EvaluateStatement {
-	char * formulaName;
-	char * valuationName;
+	const char * formulaName;
+	const char * valuationName;
 };
 
 //TRUTH TABLE

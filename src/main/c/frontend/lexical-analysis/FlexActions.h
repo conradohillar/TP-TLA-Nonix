@@ -30,10 +30,10 @@ void IgnoredLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext);
 
 Token UnknownLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext);
 
-Token TokenSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token);
+Token OnlyTokenLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token);
 
 Token BooleanSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, boolean value);
 
-Token LiteralSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token);
+Token IdentifierSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token);
 
 #endif

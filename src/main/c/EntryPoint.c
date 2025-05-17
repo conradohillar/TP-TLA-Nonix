@@ -1,5 +1,5 @@
-#include "backend/code-generation/Generator.h"
-#include "backend/domain-specific/Calculator.h"
+//#include "backend/code-generation/Generator.h"
+//#include "backend/domain-specific/Calculator.h"
 #include "frontend/lexical-analysis/FlexActions.h"
 #include "frontend/syntactic-analysis/AbstractSyntaxTree.h"
 #include "frontend/syntactic-analysis/BisonActions.h"
@@ -20,8 +20,8 @@ const int main(const int count, const char ** arguments) {
 	initializeBisonActionsModule();
 	initializeSyntacticAnalyzerModule();
 	initializeAbstractSyntaxTreeModule();
-	initializeCalculatorModule();
-	initializeGeneratorModule();
+	/* initializeCalculatorModule();
+	initializeGeneratorModule(); */
 
 	// Logs the arguments of the application.
 	for (int k = 0; k < count; ++k) {
@@ -39,7 +39,7 @@ const int main(const int count, const char ** arguments) {
 	if (syntacticAnalysisStatus == ACCEPT) {
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
-		logDebugging(logger, "Computing expression value...");
+		/* logDebugging(logger, "Computing expression value...");
 		Program * program = compilerState.abstractSyntaxtTree;
 		ComputationResult computationResult = computeExpression(program->expression);
 		if (computationResult.succeed) {
@@ -53,7 +53,8 @@ const int main(const int count, const char ** arguments) {
 		// ...end of the Backend. -----------------------------------------------------------------
 		// ----------------------------------------------------------------------------------------
 		logDebugging(logger, "Releasing AST resources...");
-		releaseProgram(program);
+		releaseProgram(program); */
+		logDebugging(logger, "PARSING SUCCESSFUL !!!");
 	}
 	else {
 		logError(logger, "The syntactic-analysis phase rejects the input program.");
@@ -61,8 +62,8 @@ const int main(const int count, const char ** arguments) {
 	}
 
 	logDebugging(logger, "Releasing modules resources...");
-	shutdownGeneratorModule();
-	shutdownCalculatorModule();
+	/* shutdownGeneratorModule();
+	shutdownCalculatorModule(); */
 	shutdownAbstractSyntaxTreeModule();
 	shutdownSyntacticAnalyzerModule();
 	shutdownBisonActionsModule();

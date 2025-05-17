@@ -20,9 +20,9 @@ void shutdownBisonActionsModule();
 
 TruthTable * TruthTableAction(TruthTable * table, TruthTableEntry * entry);
 
-TruthTableEntry * TruthTableMapperEntryAction(TruthValueList * truthValueList, boolean * mapValue);
+TruthTableEntry * TruthTableMapperEntryAction(TruthValueList * truthValueList, TruthValue * mapValue);
 
-TruthTableEntry * TruthTableOtherwiseEntryAction(boolean otherwiseValue);
+TruthTableEntry * TruthTableOtherwiseEntryAction(TruthValue * otherwiseValue);
 
 TruthValueList * TruthValueListAction(TruthValueList * truthValueList, TruthValueOrWildcard * truthValueOrWildcard);
 
@@ -75,6 +75,8 @@ DefineOpset * DefineOpsetAction(const char * name, OpsetList * opsetList);
 Statement * DefineVariableStatementSemanticAction(DefineVariable * defineVariable);
 
 Statement * DefineFormulaStatementSemanticAction(DefineFormula * defineFormula);
+
+Statement * DefineValuationStatementSemanticAction(DefineValuation * defineValuation);
 
 Statement * DefineOperatorStatementSemanticAction(DefineOperator * defineOperator);
 

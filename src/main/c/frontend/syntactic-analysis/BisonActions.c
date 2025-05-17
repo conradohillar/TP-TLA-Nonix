@@ -39,7 +39,7 @@ TruthTable * TruthTableAction(TruthTable * table, TruthTableEntry * entry) {
 	return truthTable;
 }
 
-TruthTableEntry * TruthTableMapperEntryAction(TruthValueList * truthValueList, boolean * mapValue) {
+TruthTableEntry * TruthTableMapperEntryAction(TruthValueList * truthValueList, TruthValue * mapValue) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	TruthTableEntry * truthTableEntry = calloc(1, sizeof(TruthTableEntry));
 	truthTableEntry->truthValueList = truthValueList;
@@ -48,12 +48,11 @@ TruthTableEntry * TruthTableMapperEntryAction(TruthValueList * truthValueList, b
 	return truthTableEntry;
 }
 
-TruthTableEntry * TruthTableOtherwiseEntryAction(boolean otherwiseValue) {
+TruthTableEntry * TruthTableOtherwiseEntryAction(TruthValue * otherwiseValue) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	TruthTableEntry * truthTableEntry = calloc(1, sizeof(TruthTableEntry));
-	TruthValue * otherwiseValue = calloc(1, sizeof(TruthValue));
-	truthTableEntry->otherwiseValue->value = otherwiseValue; //TODO: chequear esto
-	truthTableEntry->type = OTHERWISE;
+	truthTableEntry->otherwiseValue = otherwiseValue;
+	truthTableEntry->type = OTHERWISE_ENTRY;
 	return truthTableEntry;
 }
 
@@ -76,7 +75,7 @@ TruthValueOrWildcard * TruthValueTypeAction(TruthValue * truthValue) {
 TruthValueOrWildcard * WildcardTypeAction() {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	TruthValueOrWildcard * truthValueOrWildcard = calloc(1, sizeof(TruthValueOrWildcard));
-	truthValueOrWildcard->type = WILDCARD;
+	truthValueOrWildcard->type = WILDCARD_VALUE;
 	return truthValueOrWildcard;
 }
 
