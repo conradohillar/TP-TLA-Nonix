@@ -18,75 +18,95 @@ void shutdownBisonActionsModule();
  * Bison semantic actions.
  */
 
-TruthTable * TruthTableAction(TruthTable * table, TruthTableEntry * entry);
+TruthTable *TruthTableAction(TruthTable *table, TruthTableEntry *entry);
 
-TruthTableEntry * TruthTableMapperEntryAction(TruthValueList * truthValueList, TruthValue * mapValue);
+TruthTableEntry *TruthTableMapperEntryAction(TruthValueList *truthValueList,
+                                             TruthValue *mapValue);
 
-TruthTableEntry * TruthTableOtherwiseEntryAction(TruthValue * otherwiseValue);
+TruthTableEntry *TruthTableOtherwiseEntryAction(TruthValue *otherwiseValue);
 
-TruthValueList * TruthValueListAction(TruthValueList * truthValueList, TruthValueOrWildcard * truthValueOrWildcard);
+TruthValueList *
+TruthValueListAction(TruthValueList *truthValueList,
+                     TruthValueOrWildcard *truthValueOrWildcard);
 
-TruthValueOrWildcard * TruthValueTypeAction(TruthValue * truthValue);
+TruthValueOrWildcard *TruthValueTypeAction(TruthValue *truthValue);
 
-TruthValueOrWildcard * WildcardTypeAction();
+TruthValueOrWildcard *WildcardTypeAction();
 
-TruthValue * TruthValueAction(boolean value);
+TruthValue *TruthValueAction(boolean value);
 
-BinaryExpression * BinaryExpressionSemanticAction(Expression * leftExpression, Expression * rightExpression, BinaryOperatorType operatorType);
+BinaryExpression *
+BinaryExpressionSemanticAction(Expression *leftExpression,
+                               Expression *rightExpression,
+                               BinaryOperatorType operatorType);
 
-CustomExpression * PredefinedFormulaSemanticAction(PredefinedFormula predefinedFormula);
+CustomExpression *
+PredefinedFormulaSemanticAction(PredefinedFormula predefinedFormula);
 
-CustomExpression * CustomOperatorSemanticAction(CustomOperator * customOperator);
+CustomExpression *CustomOperatorSemanticAction(CustomOperator *customOperator);
 
-NotExpression * NotExpressionSemanticAction(Expression * expression);
+NotExpression *NotExpressionSemanticAction(Expression *expression);
 
-Expression * BinaryTypeAction(BinaryExpression * binaryExpression);
+Expression *BinaryTypeAction(BinaryExpression *binaryExpression);
 
-Expression * CustomTypeAction(CustomExpression * customExpression);
+Expression *CustomTypeAction(CustomExpression *customExpression);
 
-Expression * NotTypeAction(NotExpression * notExpression);
+Expression *NotTypeAction(NotExpression *notExpression);
 
-Expression * VariableTypeAction(Variable variable);
+Expression *VariableTypeAction(Variable variable);
 
-VariableList * VariableListAction(VariableList * variableList, Variable variable);
+VariableList *VariableListAction(VariableList *variableList, Variable variable);
 
-ValuationList * ValuationListAction(ValuationList * valuationList, Valuation * valuation);
+ValuationList *ValuationListAction(ValuationList *valuationList,
+                                   Valuation *valuation);
 
-Valuation * ValuationAction(Variable variable, TruthValue * truthValue);
+Valuation *ValuationAction(Variable variable, TruthValue *truthValue);
 
-OpsetList * OpsetListAction(OpsetList * opsetList, Operator operator);
+OpsetList *OpsetListAction(OpsetList *opsetList, Operator operator);
 
-EvaluateStatement * EvaluateFormulaAction(const char * formulaName, const char * valuationName);
+EvaluateStatement *EvaluateFormulaAction(const char *formulaName,
+                                         const char *valuationName);
 
-AdequateStatement * CheckAdequacyAction(const char * opsetName);
+AdequateStatement *CheckAdequacyAction(const char *opsetName);
 
-DefineVariable * DefineVariableAction(VariableList * variableList);
+DefineVariable *DefineVariableAction(VariableList *variableList);
 
-DefineFormula * DefineFormulaAction(const char * name, Expression * expression);
+DefineFormula *DefineFormulaAction(const char *name, Expression *expression);
 
-DefineValuation * DefineValuationAction(const char * name, ValuationList * valuationList);
+DefineValuation *DefineValuationAction(const char *name,
+                                       ValuationList *valuationList);
 
-DefineOperator * DefineOperatorAction(CustomOperator * customOperator, TruthTable * truthTable);
+DefineOperator *DefineOperatorAction(CustomOperator *customOperator,
+                                     TruthTable *truthTable);
 
-CustomOperator * DefineCustomOperatorAction(const char * name, VariableList * variableList);
+CustomOperator *DefineCustomOperatorAction(const char *name,
+                                           VariableList *variableList);
 
-DefineOpset * DefineOpsetAction(const char * name, OpsetList * opsetList);
+DefineOpset *DefineOpsetAction(const char *name, OpsetList *opsetList);
 
-Statement * DefineVariableStatementSemanticAction(DefineVariable * defineVariable);
+Statement *
+DefineVariableStatementSemanticAction(DefineVariable *defineVariable);
 
-Statement * DefineFormulaStatementSemanticAction(DefineFormula * defineFormula);
+Statement *DefineFormulaStatementSemanticAction(DefineFormula *defineFormula);
 
-Statement * DefineValuationStatementSemanticAction(DefineValuation * defineValuation);
+Statement *
+DefineValuationStatementSemanticAction(DefineValuation *defineValuation);
 
-Statement * DefineOperatorStatementSemanticAction(DefineOperator * defineOperator);
+Statement *
+DefineOperatorStatementSemanticAction(DefineOperator *defineOperator);
 
-Statement * DefineOpsetStatementSemanticAction(DefineOpset * defineOpset);
+Statement *DefineOpsetStatementSemanticAction(DefineOpset *defineOpset);
 
-Statement * EvaluateStatementSemanticAction(EvaluateStatement * evaluateStatement);
+Statement *
+EvaluateStatementSemanticAction(EvaluateStatement *evaluateStatement);
 
-Statement * AdequateStatementSemanticAction(AdequateStatement * adequateStatement);
+Statement *
+AdequateStatementSemanticAction(AdequateStatement *adequateStatement);
 
-Program * ProgramStatementSemanticAction(CompilerState * compilerState, Program * nextProgram, Statement * statement);
+Program *ProgramStatementSemanticAction(CompilerState *compilerState,
+                                        Program *nextProgram,
+                                        Statement *statement);
 
+Operator *OperatorSemanticAction(Operator operator);
 
 #endif
