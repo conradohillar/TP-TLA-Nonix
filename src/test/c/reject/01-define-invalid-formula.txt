@@ -1,0 +1,1 @@
+define formula myFormula = ((p & q) | p & q);
