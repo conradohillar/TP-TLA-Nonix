@@ -1,3 +1,4 @@
 /*
  *     A multiline comment.
 */
+define variable x;
