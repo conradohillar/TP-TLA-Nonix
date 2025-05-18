@@ -59,6 +59,7 @@
 %token <keywordOrSymbol> IDENTIFIER
 %token <keywordOrSymbol> EQUALS OPEN_BRACE CLOSE_BRACE OPEN_PARENTHESIS CLOSE_PARENTHESIS COMMA SEMICOLON ARROW WILDCARD DOLLAR
 %token <truth_value> TRUE FALSE
+%token <keywordOrSymbol> UNKNOWN
 
 /** Non-terminals. */
 %type <program> program
