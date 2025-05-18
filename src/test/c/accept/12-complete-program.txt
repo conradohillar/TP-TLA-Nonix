@@ -1,0 +1,48 @@
+/* 
+    Definición de tres variables (se puede definir de a una o de a varias): 
+*/
+define variable p;
+define variable q, s;
+
+
+/*
+    Definición de dos fórmulas, la segunda utilizando la primera:
+*/
+define formula myForm1 = (p & !q);
+
+define formula myForm2 = (${myForm1} | (s => q));
+
+
+/*
+    Definición de una valuación:
+*/
+define valuation myVal =  { p = true, q = true, s = false };
+
+
+/*
+    Evaluación de la valuación
+*/
+evaluate(myForm2, myVal);
+
+
+/*
+    Crear un conectivo nuevo (XOR) usando una tabla de verdad:
+*/
+define operator XOR(x, y) = {
+    (true,  true)  -> false;
+    (true,  false) -> true;
+    (false, true)  -> true;
+    (false, false) -> false;
+};
+
+/*
+    Definir un conjunto de conectivos, utilizando algunos tradicionales y los definidos anteriormente.
+*/
+define opset myOperators = {=>, XOR, !};
+
+
+/*
+    Evaluar si el conjunto de conectivos es adecuado.
+*/
+adequate(myOperators);
+
