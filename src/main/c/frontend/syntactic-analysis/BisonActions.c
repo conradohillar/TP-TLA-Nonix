@@ -336,9 +336,3 @@ Program *ProgramStatementSemanticAction(CompilerState *compilerState,
   }
   return program;
 }
-
-Operator *OperatorSemanticAction(Operator operator) {
-  _logSyntacticAnalyzerAction(__FUNCTION__);
-  Operator *newOperator = calloc(1, sizeof(Operator));
-  return newOperator;
-}

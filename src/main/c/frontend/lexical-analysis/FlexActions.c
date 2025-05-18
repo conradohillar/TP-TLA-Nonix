@@ -65,14 +65,20 @@ Token OnlyTokenLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Toke
   return token;
 }
 
-Token BooleanSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, boolean value) {
-  _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
-  lexicalAnalyzerContext->semanticValue->truth_value = value; // TRUE is represented as 1, FALSE as 0
-  return value ? TRUE : FALSE;
-}
-
 Token IdentifierSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token) {
   _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
   lexicalAnalyzerContext->semanticValue->keywordOrSymbol = lexicalAnalyzerContext->lexeme;
   return token;
+}
+
+Token TrueSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext) {
+  _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+  lexicalAnalyzerContext->semanticValue->truth_value = true;
+  return TRUE;
+}
+
+Token FalseSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext) {
+  _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+  lexicalAnalyzerContext->semanticValue->truth_value = false;
+  return FALSE;
 }

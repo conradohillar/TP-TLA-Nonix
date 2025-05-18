@@ -36,7 +36,6 @@
     DefineOpset *defineOpset; // Declaración de conjuntos de operadores.
     EvaluateStatement *evaluateStatement; // Evaluación de una fórmula.
     AdequateStatement *adequateStatement; // Verificación de adecuación.
-	Operator *operator; // Conectivo lógico (AND, OR, etc.).
 }
 
 /**
@@ -59,8 +58,7 @@
 %token <keywordOrSymbol> AND OR THEN IFF NOT
 %token <keywordOrSymbol> IDENTIFIER
 %token <keywordOrSymbol> EQUALS OPEN_BRACE CLOSE_BRACE OPEN_PARENTHESIS CLOSE_PARENTHESIS COMMA SEMICOLON ARROW WILDCARD DOLLAR
-%token <truth_value> TRUE
-%token <truth_value> FALSE
+%token <truth_value> TRUE FALSE
 %token <keywordOrSymbol> UNKNOWN
 
 /** Non-terminals. */
@@ -87,7 +85,6 @@
 %type <evaluateStatement> evaluateStatement
 %type <adequateStatement> adequateStatement
 %type <customOperator> customOperator
-%type <operator> operator
 
 /**
  * Precedence and associativity.
@@ -157,17 +154,20 @@ truthValueOrWildcard: WILDCARD 																		{ $$ = WildcardTypeAction(); }
     | truthValue 																					{ $$ = TruthValueTypeAction($1); }
     ;
 
-truthValue: TRUE 																					{ $$ = TruthValueAction(true); }
-    | FALSE      																					{ $$ = TruthValueAction(false); }
+truthValue: TRUE 																					{ $$ = TruthValueAction($1); }
+    | FALSE      																					{ $$ = TruthValueAction($1); }
     ;
 
 defineOpset: DEFINE OPSET IDENTIFIER EQUALS OPEN_BRACE opsetList CLOSE_BRACE 						{ $$ = DefineOpsetAction($3, $6); }
 	;
 
 opsetList: IDENTIFIER 																				{ $$ = OpsetListAction(NULL, $1); }
-	| operator																						{ $$ = OpsetListAction(NULL, $1); }			
-	| opsetList COMMA operator 																		{ $$ = OpsetListAction($1, $2); }								
 	| opsetList COMMA IDENTIFIER 																	{ $$ = OpsetListAction($1, $3); }
+	| opsetList COMMA AND 																			{ $$ = OpsetListAction($1, $3); }
+	| opsetList COMMA OR 																			{ $$ = OpsetListAction($1, $3); }
+	| opsetList COMMA THEN 																			{ $$ = OpsetListAction($1, $3); }
+	| opsetList COMMA IFF 																			{ $$ = OpsetListAction($1, $3); }
+	| opsetList COMMA NOT 																			{ $$ = OpsetListAction($1, $3); }
 	;
 
 evaluateStatement: EVALUATE OPEN_PARENTHESIS IDENTIFIER COMMA IDENTIFIER CLOSE_PARENTHESIS			{ $$ = EvaluateFormulaAction($3, $5); }
@@ -182,7 +182,10 @@ expression: binaryExpression																		{ $$ = BinaryTypeAction($1); }
     | IDENTIFIER																					{ $$ = VariableTypeAction($1); }
     ;	
 
-binaryExpression: OPEN_PARENTHESIS expression[left] operator expression[right] CLOSE_PARENTHESIS	{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_AND); }
+binaryExpression: OPEN_PARENTHESIS expression[left] AND expression[right] CLOSE_PARENTHESIS			{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_AND); }
+	| OPEN_PARENTHESIS expression[left] OR expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_OR); }
+	| OPEN_PARENTHESIS expression[left] THEN expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_THEN); }
+	| OPEN_PARENTHESIS expression[left] IFF expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_IFF); }
     ;
 
 customExpression: DOLLAR OPEN_BRACE IDENTIFIER CLOSE_BRACE 											{ $$ = PredefinedFormulaSemanticAction($3); }
@@ -191,11 +194,5 @@ customExpression: DOLLAR OPEN_BRACE IDENTIFIER CLOSE_BRACE 											{ $$ = Pre
 
 notExpression: NOT expression 																		{ $$ = NotExpressionSemanticAction($2); }
 	;
-
-operator: AND 																						{ $$ = OperatorSemanticAction($1); }
-	| OR 																							{ $$ = OperatorSemanticAction($1); }
-	| THEN 																							{ $$ = OperatorSemanticAction($1); }
-	| IFF 																							{ $$ = OperatorSemanticAction($1); }
-	| NOT 																							{ $$ = OperatorSemanticAction($1); }
 
 %%

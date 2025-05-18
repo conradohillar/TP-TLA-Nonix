@@ -40,14 +40,14 @@
 "evaluate"                          { return OnlyTokenLexemeAction(createLexicalAnalyzerContext(), EVALUATE); }
 "adequate"                          { return OnlyTokenLexemeAction(createLexicalAnalyzerContext(), ADEQUATE); }
 "otherwise"                         { return OnlyTokenLexemeAction(createLexicalAnalyzerContext(), OTHERWISE); }
-"true"                              { return BooleanSemanticValueLexemeAction(createLexicalAnalyzerContext(), true); }
-"false"                             { return BooleanSemanticValueLexemeAction(createLexicalAnalyzerContext(), false); }
+"true"                              { return TrueSemanticValueLexemeAction(createLexicalAnalyzerContext()); }
+"false"                             { return FalseSemanticValueLexemeAction(createLexicalAnalyzerContext()); }
 
-"&"                                 { return OnlyTokenLexemeAction(createLexicalAnalyzerContext(), AND); }
-"|"                                 { return OnlyTokenLexemeAction(createLexicalAnalyzerContext(), OR); }
-"!"                                 { return OnlyTokenLexemeAction(createLexicalAnalyzerContext(), NOT); }
-"=>"                                { return OnlyTokenLexemeAction(createLexicalAnalyzerContext(), THEN); }
-"<=>"                               { return OnlyTokenLexemeAction(createLexicalAnalyzerContext(), IFF); }
+"&"                                 { return IdentifierSemanticValueLexemeAction(createLexicalAnalyzerContext(), AND); }
+"|"                                 { return IdentifierSemanticValueLexemeAction(createLexicalAnalyzerContext(), OR); }
+"!"                                 { return IdentifierSemanticValueLexemeAction(createLexicalAnalyzerContext(), NOT); }
+"=>"                                { return IdentifierSemanticValueLexemeAction(createLexicalAnalyzerContext(), THEN); }
+"<=>"                               { return IdentifierSemanticValueLexemeAction(createLexicalAnalyzerContext(), IFF); }
 
 [a-zA-Z_][a-zA-Z0-9_]*              { return IdentifierSemanticValueLexemeAction(createLexicalAnalyzerContext(), IDENTIFIER); }
 

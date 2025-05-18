@@ -107,6 +107,4 @@ Program *ProgramStatementSemanticAction(CompilerState *compilerState,
                                         Program *nextProgram,
                                         Statement *statement);
 
-Operator *OperatorSemanticAction(Operator operator);
-
 #endif

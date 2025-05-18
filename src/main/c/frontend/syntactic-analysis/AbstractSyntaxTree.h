@@ -43,11 +43,11 @@ typedef struct Valuation Valuation;
 
 typedef struct DefineOpset DefineOpset;
 typedef struct OpsetList OpsetList;
-typedef const char * Operator;
 
 typedef struct DefineOperator DefineOperator;
 typedef struct BinaryOperator BinaryOperator;
 typedef struct CustomOperator CustomOperator;
+typedef const char * Operator;
 
 typedef struct AdequateStatement AdequateStatement;
 typedef struct EvaluateStatement EvaluateStatement;

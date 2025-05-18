@@ -32,8 +32,11 @@ Token UnknownLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext);
 
 Token OnlyTokenLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token);
 
-Token BooleanSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, boolean value);
-
 Token IdentifierSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token);
+
+Token TrueSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext);
+
+Token FalseSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext);
+
 
 #endif

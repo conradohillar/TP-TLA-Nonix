@@ -3,3 +3,8 @@ define operator myOp(p, q, r, s) = {
     (false, true, false, true) -> false;
     false otherwise;
 }; 
+
+define operator myOp2(x, y, z) = {
+    (?, ?, true) -> true;
+    (?, ?, false) -> false;
+};
