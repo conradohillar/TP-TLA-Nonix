@@ -1,0 +1,4 @@
+define operator myOp(x, y, z) = {
+    (?, ?, true) -> true;
+    (?, ?, false) -> false;
+};
