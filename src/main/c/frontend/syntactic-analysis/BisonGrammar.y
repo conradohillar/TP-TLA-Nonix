@@ -168,6 +168,11 @@ opsetList: IDENTIFIER 																				{ $$ = OpsetListAction(NULL, $1); }
 	| opsetList COMMA THEN 																			{ $$ = OpsetListAction($1, $3); }
 	| opsetList COMMA IFF 																			{ $$ = OpsetListAction($1, $3); }
 	| opsetList COMMA NOT 																			{ $$ = OpsetListAction($1, $3); }
+	| AND 																							{ $$ = OpsetListAction(NULL, $1); }
+	| OR																							{ $$ = OpsetListAction(NULL, $1); }
+	| THEN																							{ $$ = OpsetListAction(NULL, $1); }
+	| IFF																							{ $$ = OpsetListAction(NULL, $1); }
+	| NOT																							{ $$ = OpsetListAction(NULL, $1); }
 	;
 
 evaluateStatement: EVALUATE OPEN_PARENTHESIS IDENTIFIER COMMA IDENTIFIER CLOSE_PARENTHESIS			{ $$ = EvaluateFormulaAction($3, $5); }
