@@ -32,6 +32,7 @@ _logLexicalAnalyzerContext(const char *functionName, LexicalAnalyzerContext *lex
                functionName, escapedLexeme,
                lexicalAnalyzerContext->currentContext,
                lexicalAnalyzerContext->length, lexicalAnalyzerContext->line);
+              
   free(escapedLexeme);
 }
 
@@ -41,44 +42,52 @@ void BeginMultilineCommentLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerCo
   if (_logIgnoredLexemes) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
   }
+  destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 }
 
 void EndMultilineCommentLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext) {
   if (_logIgnoredLexemes) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
   }
+  destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 }
 
 void IgnoredLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext) {
   if (_logIgnoredLexemes) {
     _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
   }
+  destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
 }
 
 Token UnknownLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext) {
   _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+  destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
   return UNKNOWN;
 }
 
 Token OnlyTokenLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token) {
   _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
+  destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
   return token;
 }
 
 Token IdentifierSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token) {
   _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
   lexicalAnalyzerContext->semanticValue->keywordOrSymbol = lexicalAnalyzerContext->lexeme;
+  destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
   return token;
 }
 
 Token TrueSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext) {
   _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
   lexicalAnalyzerContext->semanticValue->truth_value = true;
+  destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
   return TRUE;
 }
 
 Token FalseSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext) {
   _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
   lexicalAnalyzerContext->semanticValue->truth_value = false;
+  destroyLexicalAnalyzerContext(lexicalAnalyzerContext);
   return FALSE;
 }

@@ -36,6 +36,7 @@
     DefineOpset *defineOpset; // Declaración de conjuntos de operadores.
     EvaluateStatement *evaluateStatement; // Evaluación de una fórmula.
     AdequateStatement *adequateStatement; // Verificación de adecuación.
+	//LexicalAnalyzerContext *lexicalAnalizerContext; // Contexto del analizador léxico.
 }
 
 /**
@@ -46,12 +47,46 @@
  *
  * @see https://www.gnu.org/software/bison/manual/html_node/Destructor-Decl.html
  */
-/*
-%destructor { releaseConstant($$); } <constant>
-%destructor { releaseExpression($$); } <expression>
-%destructor { releaseFactor($$); } <factor>
+
+
 %destructor { releaseProgram($$); } <program>
-*/
+%destructor { releaseStatement($$); } <statement>
+
+%destructor { releaseExpression($$); } <expression>
+%destructor { releaseBinaryExpression($$); } <binaryExpression>
+%destructor { releaseCustomExpression($$); } <customExpression>
+%destructor { releaseNotExpression($$); } <notExpression>
+
+%destructor { releaseVariableList($$); } <variableList>
+%destructor { releaseDefineVariable($$); } <defineVariable>
+
+%destructor { releaseDefineFormula($$); } <defineFormula>
+
+%destructor { releaseDefineValuation($$); } <defineValuation>
+%destructor { releaseValuationList($$); } <valuationList>
+%destructor { releaseValuation($$); } <valuation>
+
+
+%destructor { releaseOpsetList($$); } <opsetList>
+%destructor { releaseDefineOpset($$); } <defineOpset>
+
+%destructor { releaseDefineOperator($$); } <defineOperator>
+%destructor { releaseCustomOperator($$); } <customOperator>
+
+%destructor { releaseEvaluateStatement($$); } <evaluateStatement>
+%destructor { releaseAdequateStatement($$); } <adequateStatement>
+
+
+%destructor { releaseTruthTable($$); } <truthTable>
+%destructor { releaseTruthTableEntry($$); } <truthTableEntry>
+%destructor { releaseTruthValueList($$); } <truthValueList>
+%destructor { releaseTruthValueOrWildcard($$); } <truthValueOrWildcard>
+%destructor { releaseTruthValue($$); } <truthValue>
+
+//%destructor { destroyLexicalAnalyzerContext($$); } <lexicalAnalizerContext>
+
+
+
 
 /** Terminals. */
 %token <keywordOrSymbol> DEFINE VARIABLE FORMULA VALUATION OPERATOR OPSET EVALUATE ADEQUATE OTHERWISE
@@ -100,7 +135,7 @@
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 
 program: program statement SEMICOLON																{ $$ = ProgramStatementSemanticAction(currentCompilerState(), $1, $2); }
-	| statement SEMICOLON																			{ $$ = ProgramStatementSemanticAction(currentCompilerState(), NULL, NULL); }
+	| statement SEMICOLON																			{ $$ = ProgramStatementSemanticAction(currentCompilerState(), NULL, $1); }
 	;
 
 statement: defineVariable																			{ $$ = DefineVariableStatementSemanticAction($1); }

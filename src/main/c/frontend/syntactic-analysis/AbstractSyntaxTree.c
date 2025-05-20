@@ -19,14 +19,17 @@ void shutdownAbstractSyntaxTreeModule() {
 void releaseProgram(Program * program) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (program != NULL) {
+		if(program->next != NULL) {
+			releaseProgram(program->next);
+		}
 		releaseStatement(program->statement);
-		releaseProgram(program->next);
 		free((void *)program);
 	}
 }
 
 void releaseStatement(Statement * statement) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+
 	if (statement != NULL) {
 		switch (statement->type) {
 			case DEFINE_VARIABLE:
@@ -69,7 +72,6 @@ void releaseExpression(Expression * expression){
 				releaseCustomExpression(expression->customExpression);
 				break;
 			case VARIABLE_EXPRESSION:
-				free((void *)expression->variable);
 				break;
 		}
 		free((void *)expression);
@@ -98,7 +100,6 @@ void releaseCustomExpression(CustomExpression * customExpression) {
 	if (customExpression != NULL) {
 		switch (customExpression->type) {
 			case PREDEFINED_FORMULA:
-				free((void *)customExpression->predefinedFormula);
 				break;
 			case CUSTOM_OPERATOR:
 				releaseCustomOperator(customExpression->customOperator);
@@ -120,7 +121,6 @@ void releaseVariableList(VariableList * variableList) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (variableList != NULL) {
 		releaseVariableList(variableList->next);
-		free((void *)variableList->variable);
 		free((void *)variableList);
 	}
 }
@@ -129,7 +129,6 @@ void releaseDefineFormula(DefineFormula * defineFormula) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (defineFormula != NULL) {
 		releaseExpression(defineFormula->expression);
-		free((void *)defineFormula->name);
 		free((void *)defineFormula);
 	}
 }
@@ -155,7 +154,6 @@ void releaseValuation(Valuation * valuation) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (valuation != NULL) {
 		releaseTruthValue(valuation->truthValue);
-		free((void *)valuation->variable);
 		free((void *)valuation);
 	}
 }
@@ -164,7 +162,6 @@ void releaseDefineOpset(DefineOpset * defineOpset) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (defineOpset != NULL) {
 		releaseOpsetList(defineOpset->opsetList);
-		free((void *)defineOpset->name);
 		free((void *)defineOpset);
 	}
 }
@@ -190,7 +187,6 @@ void releaseCustomOperator(CustomOperator * customOperator) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (customOperator != NULL) {
 		releaseVariableList(customOperator->variableList);
-		free((void *)customOperator->name);
 		free((void *)customOperator);
 	}
 }
@@ -198,7 +194,6 @@ void releaseCustomOperator(CustomOperator * customOperator) {
 void releaseAdequateStatement(AdequateStatement * adequateStatement) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (adequateStatement != NULL) {
-		free((void *)adequateStatement->opsetName);
 		free((void *)adequateStatement);
 	}
 }
@@ -206,8 +201,6 @@ void releaseAdequateStatement(AdequateStatement * adequateStatement) {
 void releaseEvaluateStatement(EvaluateStatement * evaluateStatement) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (evaluateStatement != NULL) {
-		free((void *)evaluateStatement->formulaName);
-		free((void *)evaluateStatement->valuationName);
 		free((void *)evaluateStatement);
 	}
 }
@@ -220,6 +213,7 @@ void releaseTruthTable(TruthTable * truthTable) {
 		free((void *)truthTable);
 	}
 }
+
 void releaseTruthTableEntry(TruthTableEntry * truthTableEntry) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (truthTableEntry != NULL) {
@@ -248,14 +242,7 @@ void releaseTruthValueList(TruthValueList * truthValueList) {
 void releaseTruthValueOrWildcard(TruthValueOrWildcard * truthValueOrWildcard) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (truthValueOrWildcard != NULL) {
-		switch (truthValueOrWildcard->type) {
-			case TRUTH_VALUE:
-				releaseTruthValue(truthValueOrWildcard->truthValue);
-				break;
-			case WILDCARD_VALUE:
-				// No need to free anything
-				break;
-		}
+		releaseTruthValue(truthValueOrWildcard->truthValue);
 		free((void *)truthValueOrWildcard);
 	}
 }
