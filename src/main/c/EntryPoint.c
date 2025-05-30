@@ -31,6 +31,7 @@ const int main(const int count, const char ** arguments) {
 	// Begin compilation process.
 	CompilerState compilerState = {
 		.abstractSyntaxtTree = NULL,
+		.symbolTable = NULL,
 		.succeed = false,
 		.value = 0
 	};
