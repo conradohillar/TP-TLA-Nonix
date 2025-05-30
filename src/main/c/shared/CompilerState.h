@@ -1,7 +1,7 @@
 #ifndef COMPILER_STATE_HEADER
 #define COMPILER_STATE_HEADER
 
-#include "Type.h"
+#include "SymbolTable.h"
 
 /**
  * The general status of a compilation.

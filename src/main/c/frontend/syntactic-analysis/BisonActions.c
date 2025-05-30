@@ -1,6 +1,4 @@
 #include "BisonActions.h"
-#include "SymbolTable.h"
-
 /* MODULE INTERNAL STATE */
 
 static Logger *_logger = NULL;
@@ -93,8 +91,11 @@ TruthValue *TruthValueAction(boolean value) {
 BinaryExpression *
 BinaryExpressionSemanticAction(Expression *leftExpression,
                                Expression *rightExpression,
+                               Operator operator,
                                BinaryOperatorType operatorType) {
   _logSyntacticAnalyzerAction(__FUNCTION__);
+  free((void *)operator); // Free the operator as it is not used in BinaryExpression
+
   BinaryExpression *binaryExpression = calloc(1, sizeof(BinaryExpression));
   binaryExpression->leftExpression = leftExpression;
   binaryExpression->rightExpression = rightExpression;
@@ -119,8 +120,10 @@ CustomExpression *CustomOperatorSemanticAction(CustomOperator *customOperator) {
   return customExpression;
 }
 
-NotExpression *NotExpressionSemanticAction(Expression *expression) {
+NotExpression *NotExpressionSemanticAction(Operator operator, Expression *expression) {
   _logSyntacticAnalyzerAction(__FUNCTION__);
+  free((void *)operator); // Free the operator as it is not used in NotExpression
+
   NotExpression *notExpression = calloc(1, sizeof(NotExpression));
   notExpression->expression = expression;
   return notExpression;
@@ -165,8 +168,9 @@ Expression *VariableTypeAction(Variable variable) {
 
 VariableList *VariableListAction(VariableList *variableList,
                                  Variable variable) {
-  if (!find_symbol(currentCompilerState()->symbolTable, variable)) {
-    logError(_logger, "Variable '%s' is not defined.", variable);
+  if (!insert_symbol(&currentCompilerState()->symbolTable, variable, SYMBOL_VARIABLE,
+                     0)) {
+    logError(_logger, "Failed to insert variable '%s' into symbol table.", variable);
     currentCompilerState()->succeed = false;
     // TODO: Handle the error properly, maybe return NULL or an error code
   }
@@ -201,7 +205,11 @@ Valuation *ValuationAction(Variable variable, TruthValue *truthValue) {
 
 OpsetList *OpsetListAction(OpsetList *opsetList, Operator operator) {
   if (!find_symbol(currentCompilerState()->symbolTable, operator)
-      // TODO : Check standard operators (AND, OR, NOT, etc.)
+      && strcmp(operator, "&") != 0
+      && strcmp(operator, "|") != 0
+      && strcmp(operator, "=>") != 0
+      && strcmp(operator, "<=>") != 0
+      && strcmp(operator, "!") != 0
   ) {
     logError(_logger, "Operator '%s' is not defined.", operator);
     currentCompilerState()->succeed = false;
@@ -218,6 +226,11 @@ EvaluateStatement *EvaluateFormulaAction(const char *formulaName,
                                          const char *valuationName) {
   if (!find_symbol(currentCompilerState()->symbolTable, formulaName)) {
     logError(_logger, "Formula '%s' is not defined.", formulaName);
+    currentCompilerState()->succeed = false;
+    // TODO: Handle the error properly, maybe return NULL or an error code
+  }
+  if (!find_symbol(currentCompilerState()->symbolTable, valuationName)) {
+    logError(_logger, "Valuation '%s' is not defined.", valuationName);
     currentCompilerState()->succeed = false;
     // TODO: Handle the error properly, maybe return NULL or an error code
   }
@@ -248,7 +261,7 @@ DefineVariable *DefineVariableAction(VariableList *variableList) {
 }
 
 DefineFormula *DefineFormulaAction(const char *name, Expression *expression) {
-  if (!insert_symbol(currentCompilerState()->symbolTable, name, SYMBOL_FORMULA,
+  if (!insert_symbol(&currentCompilerState()->symbolTable, name, SYMBOL_FORMULA,
                      0)) {
     logError(_logger, "Failed to insert formula '%s' into symbol table.", name);
     currentCompilerState()->succeed = false;
@@ -263,7 +276,7 @@ DefineFormula *DefineFormulaAction(const char *name, Expression *expression) {
 
 DefineValuation *DefineValuationAction(const char *name,
                                        ValuationList *valuationList) {
-  if (!insert_symbol(currentCompilerState()->symbolTable, name,
+  if (!insert_symbol(&currentCompilerState()->symbolTable, name,
                      SYMBOL_VALUATION, 0)) {
     logError(_logger, "Failed to insert valuation '%s' into symbol table.",
              name);
@@ -289,7 +302,7 @@ DefineOperator *DefineOperatorAction(CustomOperator *customOperator,
 CustomOperator *DefineCustomOperatorAction(const char *name,
                                            VariableList *variableList) {
 
-  if (!insert_symbol(currentCompilerState()->symbolTable, name, SYMBOL_OPERATOR,
+  if (!insert_symbol(&currentCompilerState()->symbolTable, name, SYMBOL_OPERATOR,
                      // TODO: Add the number of arguments for the operator
                      0)) {
     logError(_logger, "Failed to insert operator '%s' into symbol table.",
@@ -306,7 +319,7 @@ CustomOperator *DefineCustomOperatorAction(const char *name,
 }
 
 DefineOpset *DefineOpsetAction(const char *name, OpsetList *opsetList) {
-  if (!insert_symbol(currentCompilerState()->symbolTable, name, SYMBOL_OPSET,
+  if (!insert_symbol(&currentCompilerState()->symbolTable, name, SYMBOL_OPSET,
                      0)) {
     logError(_logger, "Failed to insert opset '%s' into symbol table.", name);
     currentCompilerState()->succeed = false;

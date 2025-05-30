@@ -1,9 +1,8 @@
-// symbol_table.h
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
-#include "../../shared/HashMap.h"
-#include "../shared/Type.h"
+#include "HashMap.h"
+#include "Type.h"
 
 typedef enum {
   SYMBOL_VARIABLE,

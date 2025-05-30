@@ -8,6 +8,4 @@ typedef enum {
 
 typedef int Token;
 
-typedef struct SymbolEntry SymbolEntry;
-
 #endif

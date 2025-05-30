@@ -222,17 +222,17 @@ expression: binaryExpression																		{ $$ = BinaryTypeAction($1); }
     | IDENTIFIER																					{ $$ = VariableTypeAction($1); }
     ;	
 
-binaryExpression: OPEN_PARENTHESIS expression[left] AND expression[right] CLOSE_PARENTHESIS			{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_AND); }
-	| OPEN_PARENTHESIS expression[left] OR expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_OR); }
-	| OPEN_PARENTHESIS expression[left] THEN expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_THEN); }
-	| OPEN_PARENTHESIS expression[left] IFF expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_IFF); }
+binaryExpression: OPEN_PARENTHESIS expression[left] AND[op] expression[right] CLOSE_PARENTHESIS			{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_AND); }
+	| OPEN_PARENTHESIS expression[left] OR[op] expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_OR); }
+	| OPEN_PARENTHESIS expression[left] THEN[op] expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_THEN); }
+	| OPEN_PARENTHESIS expression[left] IFF[op] expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_IFF); }
     ;
 
 customExpression: DOLLAR OPEN_BRACE IDENTIFIER CLOSE_BRACE 											{ $$ = PredefinedFormulaSemanticAction($3); }
 	| customOperator																				{ $$ = CustomOperatorSemanticAction($1); }	 																		
 	;
 
-notExpression: NOT expression 																		{ $$ = NotExpressionSemanticAction($2); }
+notExpression: NOT expression 																		{ $$ = NotExpressionSemanticAction($1, $2); }
 	;
 
 %%

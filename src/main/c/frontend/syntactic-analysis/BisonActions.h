@@ -38,6 +38,7 @@ TruthValue *TruthValueAction(boolean value);
 BinaryExpression *
 BinaryExpressionSemanticAction(Expression *leftExpression,
                                Expression *rightExpression,
+                               Operator operator,
                                BinaryOperatorType operatorType);
 
 CustomExpression *
@@ -45,7 +46,7 @@ PredefinedFormulaSemanticAction(PredefinedFormula predefinedFormula);
 
 CustomExpression *CustomOperatorSemanticAction(CustomOperator *customOperator);
 
-NotExpression *NotExpressionSemanticAction(Expression *expression);
+NotExpression *NotExpressionSemanticAction(Operator operator, Expression *expression);
 
 Expression *BinaryTypeAction(BinaryExpression *binaryExpression);
 

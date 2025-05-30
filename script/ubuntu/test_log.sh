@@ -13,7 +13,7 @@ STATUS=0
 echo "Compiler should accept..."
 echo ""
 
-for test in $(ls src/test/c/accept/); do
+for test in $(ls src/test/c/accept); do
 	cat "src/test/c/accept/$test" | build/Compiler 2>&1
 	RESULT="$?"
 	if [ "$RESULT" == "0" ]; then

@@ -62,6 +62,12 @@ const int main(const int count, const char ** arguments) {
 		compilationStatus = FAILED;
 	}
 
+	// Release resources.
+	// releaseProgram(compilerState.abstractSyntaxtTree);
+	if (compilerState.symbolTable != NULL) {
+		free_symbol_table(&compilerState.symbolTable);
+	}
+
 	logDebugging(logger, "Releasing modules resources...");
 	/* shutdownGeneratorModule();
 	shutdownCalculatorModule(); */
