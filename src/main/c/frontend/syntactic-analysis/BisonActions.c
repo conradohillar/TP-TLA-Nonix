@@ -1,4 +1,5 @@
 #include "BisonActions.h"
+#include "SymbolTable.h"
 
 /* MODULE INTERNAL STATE */
 
@@ -150,6 +151,11 @@ Expression *NotTypeAction(NotExpression *notExpression) {
 }
 
 Expression *VariableTypeAction(Variable variable) {
+  if (!find_symbol(currentCompilerState()->symbolTable, variable)) {
+    logError(_logger, "Variable '%s' is not defined.", variable);
+    currentCompilerState()->succeed = false;
+    // TODO: Handle the error properly, maybe return NULL or an error code
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   Expression *expression = calloc(1, sizeof(Expression));
   expression->variable = variable;
@@ -159,6 +165,11 @@ Expression *VariableTypeAction(Variable variable) {
 
 VariableList *VariableListAction(VariableList *variableList,
                                  Variable variable) {
+  if (!find_symbol(currentCompilerState()->symbolTable, variable)) {
+    logError(_logger, "Variable '%s' is not defined.", variable);
+    currentCompilerState()->succeed = false;
+    // TODO: Handle the error properly, maybe return NULL or an error code
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   VariableList *newVariableList = calloc(1, sizeof(VariableList));
   newVariableList->variable = variable;
@@ -176,6 +187,11 @@ ValuationList *ValuationListAction(ValuationList *valuationList,
 }
 
 Valuation *ValuationAction(Variable variable, TruthValue *truthValue) {
+  if (!find_symbol(currentCompilerState()->symbolTable, variable)) {
+    logError(_logger, "Variable '%s' is not defined.", variable);
+    currentCompilerState()->succeed = false;
+    // TODO: Handle the error properly, maybe return NULL or an error code
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   Valuation *valuation = calloc(1, sizeof(Valuation));
   valuation->variable = variable;
@@ -184,6 +200,13 @@ Valuation *ValuationAction(Variable variable, TruthValue *truthValue) {
 }
 
 OpsetList *OpsetListAction(OpsetList *opsetList, Operator operator) {
+  if (!find_symbol(currentCompilerState()->symbolTable, operator)
+      // TODO : Check standard operators (AND, OR, NOT, etc.)
+  ) {
+    logError(_logger, "Operator '%s' is not defined.", operator);
+    currentCompilerState()->succeed = false;
+    // TODO: Handle the error properly, maybe return NULL or an error code
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   OpsetList *newOpsetList = calloc(1, sizeof(OpsetList));
   newOpsetList->operator= operator;
@@ -193,6 +216,11 @@ OpsetList *OpsetListAction(OpsetList *opsetList, Operator operator) {
 
 EvaluateStatement *EvaluateFormulaAction(const char *formulaName,
                                          const char *valuationName) {
+  if (!find_symbol(currentCompilerState()->symbolTable, formulaName)) {
+    logError(_logger, "Formula '%s' is not defined.", formulaName);
+    currentCompilerState()->succeed = false;
+    // TODO: Handle the error properly, maybe return NULL or an error code
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   EvaluateStatement *evaluateStatement = calloc(1, sizeof(EvaluateStatement));
   evaluateStatement->formulaName = formulaName;
@@ -201,6 +229,11 @@ EvaluateStatement *EvaluateFormulaAction(const char *formulaName,
 }
 
 AdequateStatement *CheckAdequacyAction(const char *opsetName) {
+  if (!find_symbol(currentCompilerState()->symbolTable, opsetName)) {
+    logError(_logger, "Opset '%s' is not defined.", opsetName);
+    currentCompilerState()->succeed = false;
+    // TODO: Handle the error properly, maybe return NULL or an error code
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   AdequateStatement *adequateStatement = calloc(1, sizeof(AdequateStatement));
   adequateStatement->opsetName = opsetName;
@@ -215,6 +248,12 @@ DefineVariable *DefineVariableAction(VariableList *variableList) {
 }
 
 DefineFormula *DefineFormulaAction(const char *name, Expression *expression) {
+  if (!insert_symbol(currentCompilerState()->symbolTable, name, SYMBOL_FORMULA,
+                     0)) {
+    logError(_logger, "Failed to insert formula '%s' into symbol table.", name);
+    currentCompilerState()->succeed = false;
+    // TODO: Handle the error properly, maybe return NULL or an error code
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   DefineFormula *defineFormula = calloc(1, sizeof(DefineFormula));
   defineFormula->name = name;
@@ -224,6 +263,13 @@ DefineFormula *DefineFormulaAction(const char *name, Expression *expression) {
 
 DefineValuation *DefineValuationAction(const char *name,
                                        ValuationList *valuationList) {
+  if (!insert_symbol(currentCompilerState()->symbolTable, name,
+                     SYMBOL_VALUATION, 0)) {
+    logError(_logger, "Failed to insert valuation '%s' into symbol table.",
+             name);
+    currentCompilerState()->succeed = false;
+    // TODO: Handle the error properly, maybe return NULL or an error code
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   DefineValuation *defineValuation = calloc(1, sizeof(DefineValuation));
   defineValuation->name = name;
@@ -242,14 +288,30 @@ DefineOperator *DefineOperatorAction(CustomOperator *customOperator,
 
 CustomOperator *DefineCustomOperatorAction(const char *name,
                                            VariableList *variableList) {
+
+  if (!insert_symbol(currentCompilerState()->symbolTable, name, SYMBOL_OPERATOR,
+                     // TODO: Add the number of arguments for the operator
+                     0)) {
+    logError(_logger, "Failed to insert operator '%s' into symbol table.",
+             name);
+    currentCompilerState()->succeed = false;
+    // TODO: Handle the error properly, maybe return NULL or an error code
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   CustomOperator *customOperator = calloc(1, sizeof(CustomOperator));
   customOperator->name = name;
   customOperator->variableList = variableList;
+
   return customOperator;
 }
 
 DefineOpset *DefineOpsetAction(const char *name, OpsetList *opsetList) {
+  if (!insert_symbol(currentCompilerState()->symbolTable, name, SYMBOL_OPSET,
+                     0)) {
+    logError(_logger, "Failed to insert opset '%s' into symbol table.", name);
+    currentCompilerState()->succeed = false;
+    // TODO : Handle the error properly, maybe return NULL or an error code
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   DefineOpset *defineOpset = calloc(1, sizeof(DefineOpset));
   defineOpset->name = name;
