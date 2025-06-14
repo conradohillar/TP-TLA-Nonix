@@ -1,0 +1,3 @@
+define variable p, q;
+define valuation myVal = {p = true, q = false};
+evaluate(q, myVal);

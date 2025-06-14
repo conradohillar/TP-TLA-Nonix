@@ -1,0 +1,5 @@
+define operator myOp(x,y,z) = {
+    false otherwise;
+};
+define variable p, q;
+define formula myForm = myOp(p,q);

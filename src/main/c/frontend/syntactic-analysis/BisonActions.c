@@ -169,11 +169,6 @@ Expression *VariableTypeAction(Variable variable) {
 }
 
 VariableList *VariableListAction(VariableList *variableList, Variable variable) {
-  if (!insert_symbol(&currentCompilerState()->symbolTable, variable, SYMBOL_VARIABLE, 0)) {
-    logError(_logger, "Failed to insert variable '%s' into symbol table.", variable);
-    currentCompilerState()->succeed = false;
-  // TODO: Handle the error properly, maybe return NULL or an error code
-  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   VariableList *newVariableList = calloc(1, sizeof(VariableList));
   newVariableList->variable = strdup(variable);
@@ -255,14 +250,21 @@ AdequateStatement *CheckAdequacyAction(const char *opsetName) {
 
 DefineVariable *DefineVariableAction(VariableList *variableList) {
   _logSyntacticAnalyzerAction(__FUNCTION__);
+  VariableList *aux = variableList;
+  while (aux != NULL) {
+    if (!insert_symbol(&currentCompilerState()->symbolTable, aux->variable, 0, SYMBOL_VARIABLE)) {
+      logError(_logger, "Failed to insert variable '%s' into symbol table.", aux->variable);
+      currentCompilerState()->succeed = false;
+    }
+    aux = aux->next;
+  }
   DefineVariable *defineVariable = calloc(1, sizeof(DefineVariable));
   defineVariable->variableList = variableList;
   return defineVariable;
 }
 
 DefineFormula *DefineFormulaAction(const char *name, Expression *expression) {
-  if (!insert_symbol(&currentCompilerState()->symbolTable, name, SYMBOL_FORMULA,
-                     0)) {
+  if (!insert_symbol(&currentCompilerState()->symbolTable, name, 0, SYMBOL_FORMULA)) {
     logError(_logger, "Failed to insert formula '%s' into symbol table.", name);
     currentCompilerState()->succeed = false;
     // TODO: Handle the error properly, maybe return NULL or an error code
@@ -276,8 +278,7 @@ DefineFormula *DefineFormulaAction(const char *name, Expression *expression) {
 
 DefineValuation *DefineValuationAction(const char *name,
                                        ValuationList *valuationList) {
-  if (!insert_symbol(&currentCompilerState()->symbolTable, name,
-                     SYMBOL_VALUATION, 0)) {
+  if (!insert_symbol(&currentCompilerState()->symbolTable, name, 0, SYMBOL_VALUATION)) {
     logError(_logger, "Failed to insert valuation '%s' into symbol table.",
              name);
     currentCompilerState()->succeed = false;
@@ -292,6 +293,11 @@ DefineValuation *DefineValuationAction(const char *name,
 
 DefineOperator *DefineOperatorAction(CustomOperator *customOperator,
                                      TruthTable *truthTable) {
+  if (!insert_symbol(&currentCompilerState()->symbolTable, customOperator->name, list_size(customOperator->variableList), SYMBOL_OPERATOR)) {
+    logError(_logger, "Failed to insert operator '%s' into symbol table.", customOperator->name);
+    currentCompilerState()->succeed = false;
+    // TODO: Handle the error properly, maybe return NULL or an error code
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   DefineOperator *defineOperator = calloc(1, sizeof(DefineOperator));
   defineOperator->customOperator = customOperator;
@@ -301,20 +307,6 @@ DefineOperator *DefineOperatorAction(CustomOperator *customOperator,
 
 CustomOperator *DefineCustomOperatorAction(const char *name,
                                            VariableList *variableList) {
-
-  if (!insert_symbol(&currentCompilerState()->symbolTable, name, SYMBOL_OPERATOR, list_size(variableList))) {
-    logError(_logger, "Failed to insert operator '%s' into symbol table.", name);
-    currentCompilerState()->succeed = false;
-    // TODO: Handle the error properly, maybe return NULL or an error code
-  }
-  VariableList *aux = variableList;
-  while (aux != NULL) { // Quiero quitar las variables del CustomOperator de la tabla, no me sirven
-    if (!remove_symbol(&currentCompilerState()->symbolTable, aux->variable)) {
-      logError(_logger, "Custom operator '%s' could not be created.", name);
-      currentCompilerState()->succeed = false;
-    }
-    aux = aux->next;
-  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   CustomOperator *customOperator = calloc(1, sizeof(CustomOperator));
   customOperator->name = strdup(name);
@@ -324,8 +316,7 @@ CustomOperator *DefineCustomOperatorAction(const char *name,
 }
 
 DefineOpset *DefineOpsetAction(const char *name, OpsetList *opsetList) {
-  if (!insert_symbol(&currentCompilerState()->symbolTable, name, SYMBOL_OPSET,
-                     0)) {
+  if (!insert_symbol(&currentCompilerState()->symbolTable, name, 0, SYMBOL_OPSET)) {
     logError(_logger, "Failed to insert opset '%s' into symbol table.", name);
     currentCompilerState()->succeed = false;
     // TODO : Handle the error properly, maybe return NULL or an error code

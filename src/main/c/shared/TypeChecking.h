@@ -57,7 +57,7 @@ unsigned int CheckTypeOpsetName(const char *opsetName);
 
 unsigned int CheckTypeFormula(const char *formulaName);
 
-unsigned int CheckTypeOperator(Operator operatorName, unsigned int argc);
+unsigned int CheckTypeOperator(Operator operatorName, int count);
 
 unsigned int CheckTypeValuationName(const char *valuationName);
 

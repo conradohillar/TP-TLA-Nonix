@@ -1,0 +1,4 @@
+define operator myOp(x) = {
+    true otherwise;
+};
+adequate(myOp);

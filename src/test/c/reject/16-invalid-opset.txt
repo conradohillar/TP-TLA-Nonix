@@ -1,0 +1,3 @@
+define variable p;
+define formula myForm = !p;
+define opset myOpset = {myForm, &};

@@ -1,0 +1,6 @@
+define variable p, q;
+define formula myForm1 = (p & q);
+define operator myOp(x) = {
+    false otherwise;
+};
+define formula myForm2 = ${myOp};

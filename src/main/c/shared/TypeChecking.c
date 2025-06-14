@@ -195,7 +195,7 @@ unsigned int CheckTypeFormula(const char * formula) {
     return symbolEntry != NULL && symbolEntry->type == SYMBOL_FORMULA;
 }
 
-unsigned int CheckTypeOperator(Operator operatorName, unsigned int count) {
+unsigned int CheckTypeOperator(Operator operatorName, int count) {
     SymbolEntry *symbolEntry = find_symbol(currentCompilerState()->symbolTable, operatorName);
     if(symbolEntry == NULL) {
         return strcmp(operatorName, "&") == 0
@@ -204,7 +204,7 @@ unsigned int CheckTypeOperator(Operator operatorName, unsigned int count) {
             || strcmp(operatorName, "<=>") == 0
             || strcmp(operatorName, "!") == 0;
     }
-    return symbolEntry->type == SYMBOL_OPERATOR && (count < 0 ? 1 : symbolEntry->argc == count); // Decisión de diseño: si el count es -1, no se verifica el número de argumentos
+    return symbolEntry->type == SYMBOL_OPERATOR && ((count < 0) ? 1 : (symbolEntry->argc == count)); // Decisión de diseño: si el count es -1, no se verifica el número de argumentos
 }
 
 unsigned int CheckTypeValuationName(const char * valuationName) {

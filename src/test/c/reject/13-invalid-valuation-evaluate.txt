@@ -1,0 +1,3 @@
+define variable p,q;
+define formula myForm = (p & q);
+evaluate(myForm, p);
