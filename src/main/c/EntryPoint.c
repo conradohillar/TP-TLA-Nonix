@@ -63,7 +63,7 @@ const int main(const int count, const char ** arguments) {
 	}
 
 	// Release resources.
-	// releaseProgram(compilerState.abstractSyntaxtTree);
+	//releaseProgram(compilerState.abstractSyntaxtTree);
 	if (compilerState.symbolTable != NULL) {
 		free_symbol_table(&compilerState.symbolTable);
 	}

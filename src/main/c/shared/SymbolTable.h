@@ -20,9 +20,12 @@ typedef struct SymbolEntry {
 } SymbolEntry;
 
 // Functions to manage the table
-boolean insert_symbol(SymbolEntry **table, const char *name, int argc,
-                      SymbolType type);
+boolean insert_symbol(SymbolEntry **table, const char *name, int argc, SymbolType type);
+
 SymbolEntry *find_symbol(SymbolEntry *table, const char *name);
+
+boolean remove_symbol(SymbolEntry **table, const char *name);
+
 void free_symbol_table(SymbolEntry **table);
 
 #endif

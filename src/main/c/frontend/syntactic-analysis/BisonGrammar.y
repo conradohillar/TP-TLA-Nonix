@@ -36,7 +36,6 @@
     DefineOpset *defineOpset; // Declaración de conjuntos de operadores.
     EvaluateStatement *evaluateStatement; // Evaluación de una fórmula.
     AdequateStatement *adequateStatement; // Verificación de adecuación.
-	//LexicalAnalyzerContext *lexicalAnalizerContext; // Contexto del analizador léxico.
 }
 
 /**
@@ -83,9 +82,7 @@
 %destructor { releaseTruthValueOrWildcard($$); } <truthValueOrWildcard>
 %destructor { releaseTruthValue($$); } <truthValue>
 
-//%destructor { destroyLexicalAnalyzerContext($$); } <lexicalAnalizerContext>
-
-
+%destructor { free((void*)$$);} <keywordOrSymbol> 
 
 
 /** Terminals. */
@@ -150,27 +147,39 @@ statement: defineVariable																			{ $$ = DefineVariableStatementSemant
 defineVariable: DEFINE VARIABLE variableList			    										{ $$ = DefineVariableAction($3); }
 	;
 
-defineFormula: DEFINE FORMULA IDENTIFIER EQUALS expression 											{ $$ = DefineFormulaAction($3, $5); }
+defineFormula: DEFINE FORMULA IDENTIFIER EQUALS expression 											{ $$ = DefineFormulaAction($3, $5); 
+																										if ($3){ free((void *)$3); } 
+																									}
 	;
 
-defineValuation: DEFINE VALUATION IDENTIFIER EQUALS OPEN_BRACE valuationList CLOSE_BRACE 			{ $$ = DefineValuationAction($3, $6); }
+defineValuation: DEFINE VALUATION IDENTIFIER EQUALS OPEN_BRACE valuationList CLOSE_BRACE 			{ $$ = DefineValuationAction($3, $6);
+																										if ($3) { free((void *)$3); }
+																									}
 	;
 
-variableList: IDENTIFIER 																			{ $$ = VariableListAction(NULL, $1); }
-	| variableList COMMA IDENTIFIER 																{ $$ = VariableListAction($1, $3); }
+variableList: IDENTIFIER 																			{ $$ = VariableListAction(NULL, $1);
+																										if ($1) { free((void *)$1); }
+																									}
+	| variableList COMMA IDENTIFIER 																{ $$ = VariableListAction($1, $3);
+																										if ($3) { free((void *)$3); }
+																									}
 	;
 
 valuationList: valuation 																			{ $$ = ValuationListAction(NULL, $1); }
 	| valuationList COMMA valuation 																{ $$ = ValuationListAction($1, $3); }
 	;
 
-valuation: IDENTIFIER EQUALS truthValue																{ $$ = ValuationAction($1, $3); }
+valuation: IDENTIFIER EQUALS truthValue																{ $$ = ValuationAction($1, $3);
+																										if ($1) { free((void *)$1); }
+																									}
 	;
 
 defineOperator: DEFINE OPERATOR customOperator EQUALS OPEN_BRACE truthTable CLOSE_BRACE 			{ $$ = DefineOperatorAction($3, $6); }
 	;
 
-customOperator: IDENTIFIER OPEN_PARENTHESIS variableList CLOSE_PARENTHESIS     						{ $$ = DefineCustomOperatorAction($1, $3); }
+customOperator: IDENTIFIER OPEN_PARENTHESIS variableList CLOSE_PARENTHESIS     						{ $$ = DefineCustomOperatorAction($1, $3); 
+																										if ($1) { free((void *)$1); }
+																									}
 	;
 
 truthTable: truthTableEntry 																		{ $$ = TruthTableAction(NULL, $1); }
@@ -193,46 +202,54 @@ truthValue: TRUE 																					{ $$ = TruthValueAction($1); }
     | FALSE      																					{ $$ = TruthValueAction($1); }
     ;
 
-defineOpset: DEFINE OPSET IDENTIFIER EQUALS OPEN_BRACE opsetList CLOSE_BRACE 						{ $$ = DefineOpsetAction($3, $6); }
+defineOpset: DEFINE OPSET IDENTIFIER EQUALS OPEN_BRACE opsetList CLOSE_BRACE 						{ $$ = DefineOpsetAction($3, $6);
+																										if ($3) { free((void *)$3); }
+																									}
 	;
 
-opsetList: IDENTIFIER 																				{ $$ = OpsetListAction(NULL, $1); }
-	| opsetList COMMA IDENTIFIER 																	{ $$ = OpsetListAction($1, $3); }
-	| opsetList COMMA AND 																			{ $$ = OpsetListAction($1, $3); }
-	| opsetList COMMA OR 																			{ $$ = OpsetListAction($1, $3); }
-	| opsetList COMMA THEN 																			{ $$ = OpsetListAction($1, $3); }
-	| opsetList COMMA IFF 																			{ $$ = OpsetListAction($1, $3); }
-	| opsetList COMMA NOT 																			{ $$ = OpsetListAction($1, $3); }
-	| AND 																							{ $$ = OpsetListAction(NULL, $1); }
-	| OR																							{ $$ = OpsetListAction(NULL, $1); }
-	| THEN																							{ $$ = OpsetListAction(NULL, $1); }
-	| IFF																							{ $$ = OpsetListAction(NULL, $1); }
-	| NOT																							{ $$ = OpsetListAction(NULL, $1); }
+opsetList: opsetList COMMA IDENTIFIER 																{ $$ = OpsetListAction($1, $3); if($3) { free((void *)$3); }}
+	| opsetList COMMA AND 																			{ $$ = OpsetListAction($1, $3); if($3) { free((void *)$3); }}
+	| opsetList COMMA OR 																			{ $$ = OpsetListAction($1, $3); if($3) { free((void *)$3); }}
+	| opsetList COMMA THEN 																			{ $$ = OpsetListAction($1, $3); if($3) { free((void *)$3); }}
+	| opsetList COMMA IFF 																			{ $$ = OpsetListAction($1, $3); if($3) { free((void *)$3); }}
+	| opsetList COMMA NOT 																			{ $$ = OpsetListAction($1, $3); if($3) { free((void *)$3); }}
+	| IDENTIFIER 																					{ $$ = OpsetListAction(NULL, $1); if($1) { free((void *)$1); }}
+	| AND 																							{ $$ = OpsetListAction(NULL, $1); if($1) { free((void *)$1); }}
+	| OR																							{ $$ = OpsetListAction(NULL, $1); if($1) { free((void *)$1); }}
+	| THEN																							{ $$ = OpsetListAction(NULL, $1); if($1) { free((void *)$1); }}
+	| IFF																							{ $$ = OpsetListAction(NULL, $1); if($1) { free((void *)$1); }}
+	| NOT																							{ $$ = OpsetListAction(NULL, $1); if($1) { free((void *)$1); }}
 	;
 
-evaluateStatement: EVALUATE OPEN_PARENTHESIS IDENTIFIER COMMA IDENTIFIER CLOSE_PARENTHESIS			{ $$ = EvaluateFormulaAction($3, $5); }
+evaluateStatement: EVALUATE OPEN_PARENTHESIS IDENTIFIER COMMA IDENTIFIER CLOSE_PARENTHESIS			{ $$ = EvaluateFormulaAction($3, $5);
+																										if ($3) { free((void *)$3); }
+																										if ($5) { free((void *)$5); }
+																									}		 
 	;
 
-adequateStatement: ADEQUATE OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS							{ $$ = CheckAdequacyAction($3); }
+adequateStatement: ADEQUATE OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS							{ $$ = CheckAdequacyAction($3);
+																										if ($3) { free((void *)$3); $3 = NULL; }
+																									}
 	;
 
 expression: binaryExpression																		{ $$ = BinaryTypeAction($1); }
 	| customExpression																				{ $$ = CustomTypeAction($1); }
     | notExpression 																				{ $$ = NotTypeAction($1); }
-    | IDENTIFIER																					{ $$ = VariableTypeAction($1); }
+    | IDENTIFIER																					{ $$ = VariableTypeAction($1);
+																										if ($1){ free((void *)$1);}
+																									}
     ;	
 
-binaryExpression: OPEN_PARENTHESIS expression[left] AND[op] expression[right] CLOSE_PARENTHESIS			{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_AND); }
-	| OPEN_PARENTHESIS expression[left] OR[op] expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_OR); }
-	| OPEN_PARENTHESIS expression[left] THEN[op] expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_THEN); }
-	| OPEN_PARENTHESIS expression[left] IFF[op] expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_IFF); }
+binaryExpression: OPEN_PARENTHESIS expression[left] AND[op] expression[right] CLOSE_PARENTHESIS			{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_AND); if ($op) { free((void *)$op); }}
+	| OPEN_PARENTHESIS expression[left] OR[op] expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_OR);  if ($op) { free((void *)$op); }}
+	| OPEN_PARENTHESIS expression[left] THEN[op] expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_THEN); if ($op) { free((void *)$op); }}
+	| OPEN_PARENTHESIS expression[left] IFF[op] expression[right] CLOSE_PARENTHESIS						{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_IFF); if ($op) { free((void *)$op); }}
     ;
 
-customExpression: DOLLAR OPEN_BRACE IDENTIFIER CLOSE_BRACE 											{ $$ = PredefinedFormulaSemanticAction($3); }
+customExpression: DOLLAR OPEN_BRACE IDENTIFIER CLOSE_BRACE 											{ $$ = PredefinedFormulaSemanticAction($3); if ($3) { free((void *)$3); }}
 	| customOperator																				{ $$ = CustomOperatorSemanticAction($1); }	 																		
 	;
 
-notExpression: NOT expression 																		{ $$ = NotExpressionSemanticAction($1, $2); }
+notExpression: NOT expression 																		{ $$ = NotExpressionSemanticAction($1, $2); if ($1) { free((void *)$1); }} 
 	;
-
 %%

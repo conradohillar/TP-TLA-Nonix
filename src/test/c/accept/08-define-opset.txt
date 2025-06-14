@@ -1,1 +1,16 @@
+define operator myOp1(x,y) = {
+    (true, true) -> false;
+    true otherwise;
+};
+define operator myOp2(x,y) = {
+    false otherwise;
+};
+define operator myOp3(x,y) = {
+    (true, false) -> false;
+    true otherwise;
+};
+define operator myOp4(x,y) = {
+    (true, ?) -> true;
+    false otherwise;
+};
 define opset myOpset = {myOp1, &, myOp2, myOp3, |, !, <=>, =>, myOp4};

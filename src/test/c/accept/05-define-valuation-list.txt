@@ -1,1 +1,2 @@
+define variable p, q, r, s;
 define valuation myVal2 = { p = true, q = false, r = false, s = false};

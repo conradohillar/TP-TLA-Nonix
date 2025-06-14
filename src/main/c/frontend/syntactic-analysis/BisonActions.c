@@ -66,8 +66,7 @@ TruthValueListAction(TruthValueList *truthValueList,
 
 TruthValueOrWildcard *TruthValueTypeAction(TruthValue *truthValue) {
   _logSyntacticAnalyzerAction(__FUNCTION__);
-  TruthValueOrWildcard *truthValueOrWildcard =
-      calloc(1, sizeof(TruthValueOrWildcard));
+  TruthValueOrWildcard *truthValueOrWildcard = calloc(1, sizeof(TruthValueOrWildcard));
   truthValueOrWildcard->truthValue = truthValue;
   truthValueOrWildcard->type = TRUTH_VALUE;
   return truthValueOrWildcard;
@@ -75,8 +74,7 @@ TruthValueOrWildcard *TruthValueTypeAction(TruthValue *truthValue) {
 
 TruthValueOrWildcard *WildcardTypeAction() {
   _logSyntacticAnalyzerAction(__FUNCTION__);
-  TruthValueOrWildcard *truthValueOrWildcard =
-      calloc(1, sizeof(TruthValueOrWildcard));
+  TruthValueOrWildcard *truthValueOrWildcard = calloc(1, sizeof(TruthValueOrWildcard));
   truthValueOrWildcard->type = WILDCARD_VALUE;
   return truthValueOrWildcard;
 }
@@ -94,7 +92,6 @@ BinaryExpressionSemanticAction(Expression *leftExpression,
                                Operator operator,
                                BinaryOperatorType operatorType) {
   _logSyntacticAnalyzerAction(__FUNCTION__);
-  free((void *)operator); // Free the operator as it is not used in BinaryExpression
 
   BinaryExpression *binaryExpression = calloc(1, sizeof(BinaryExpression));
   binaryExpression->leftExpression = leftExpression;
@@ -106,9 +103,15 @@ BinaryExpressionSemanticAction(Expression *leftExpression,
 CustomExpression *
 PredefinedFormulaSemanticAction(PredefinedFormula predefinedFormula) {
   _logSyntacticAnalyzerAction(__FUNCTION__);
+
+  if(find_symbol(currentCompilerState()->symbolTable, predefinedFormula) == NULL) {
+    logError(_logger, "Formula '%s' is not defined.", predefinedFormula);
+    currentCompilerState()->succeed = false;
+  }
+
   CustomExpression *customExpression = calloc(1, sizeof(CustomExpression));
   customExpression->type = PREDEFINED_FORMULA;
-  customExpression->predefinedFormula = predefinedFormula;
+  customExpression->predefinedFormula = strdup(predefinedFormula);
   return customExpression;
 }
 
@@ -122,7 +125,6 @@ CustomExpression *CustomOperatorSemanticAction(CustomOperator *customOperator) {
 
 NotExpression *NotExpressionSemanticAction(Operator operator, Expression *expression) {
   _logSyntacticAnalyzerAction(__FUNCTION__);
-  free((void *)operator); // Free the operator as it is not used in NotExpression
 
   NotExpression *notExpression = calloc(1, sizeof(NotExpression));
   notExpression->expression = expression;
@@ -154,29 +156,27 @@ Expression *NotTypeAction(NotExpression *notExpression) {
 }
 
 Expression *VariableTypeAction(Variable variable) {
-  if (!find_symbol(currentCompilerState()->symbolTable, variable)) {
+  if (find_symbol(currentCompilerState()->symbolTable, variable) == NULL) {
     logError(_logger, "Variable '%s' is not defined.", variable);
     currentCompilerState()->succeed = false;
     // TODO: Handle the error properly, maybe return NULL or an error code
   }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   Expression *expression = calloc(1, sizeof(Expression));
-  expression->variable = variable;
+  expression->variable = strdup(variable);
   expression->type = VARIABLE_EXPRESSION;
   return expression;
 }
 
-VariableList *VariableListAction(VariableList *variableList,
-                                 Variable variable) {
-  if (!insert_symbol(&currentCompilerState()->symbolTable, variable, SYMBOL_VARIABLE,
-                     0)) {
+VariableList *VariableListAction(VariableList *variableList, Variable variable) {
+  if (!insert_symbol(&currentCompilerState()->symbolTable, variable, SYMBOL_VARIABLE, 0)) {
     logError(_logger, "Failed to insert variable '%s' into symbol table.", variable);
     currentCompilerState()->succeed = false;
-    // TODO: Handle the error properly, maybe return NULL or an error code
+  // TODO: Handle the error properly, maybe return NULL or an error code
   }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   VariableList *newVariableList = calloc(1, sizeof(VariableList));
-  newVariableList->variable = variable;
+  newVariableList->variable = strdup(variable);
   newVariableList->next = variableList;
   return newVariableList;
 }
@@ -191,20 +191,20 @@ ValuationList *ValuationListAction(ValuationList *valuationList,
 }
 
 Valuation *ValuationAction(Variable variable, TruthValue *truthValue) {
-  if (!find_symbol(currentCompilerState()->symbolTable, variable)) {
+  if (find_symbol(currentCompilerState()->symbolTable, variable) == NULL) {
     logError(_logger, "Variable '%s' is not defined.", variable);
     currentCompilerState()->succeed = false;
-    // TODO: Handle the error properly, maybe return NULL or an error code
+  //TODO: Handle the error properly, maybe return NULL or an error code
   }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   Valuation *valuation = calloc(1, sizeof(Valuation));
-  valuation->variable = variable;
+  valuation->variable = strdup(variable);
   valuation->truthValue = truthValue;
   return valuation;
 }
 
 OpsetList *OpsetListAction(OpsetList *opsetList, Operator operator) {
-  if (!find_symbol(currentCompilerState()->symbolTable, operator)
+  if (find_symbol(currentCompilerState()->symbolTable, operator) == NULL
       && strcmp(operator, "&") != 0
       && strcmp(operator, "|") != 0
       && strcmp(operator, "=>") != 0
@@ -213,43 +213,43 @@ OpsetList *OpsetListAction(OpsetList *opsetList, Operator operator) {
   ) {
     logError(_logger, "Operator '%s' is not defined.", operator);
     currentCompilerState()->succeed = false;
-    // TODO: Handle the error properly, maybe return NULL or an error code
+  // TODO: Handle the error properly, maybe return NULL or an error code
   }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   OpsetList *newOpsetList = calloc(1, sizeof(OpsetList));
-  newOpsetList->operator= operator;
+  newOpsetList->operator= strdup(operator);
   newOpsetList->next = opsetList;
   return newOpsetList;
 }
 
 EvaluateStatement *EvaluateFormulaAction(const char *formulaName,
                                          const char *valuationName) {
-  if (!find_symbol(currentCompilerState()->symbolTable, formulaName)) {
+  if (find_symbol(currentCompilerState()->symbolTable, formulaName) == NULL) {
     logError(_logger, "Formula '%s' is not defined.", formulaName);
     currentCompilerState()->succeed = false;
-    // TODO: Handle the error properly, maybe return NULL or an error code
+  // TODO: Handle the error properly, maybe return NULL or an error code
   }
-  if (!find_symbol(currentCompilerState()->symbolTable, valuationName)) {
+  if (find_symbol(currentCompilerState()->symbolTable, valuationName) == NULL) {
     logError(_logger, "Valuation '%s' is not defined.", valuationName);
     currentCompilerState()->succeed = false;
-    // TODO: Handle the error properly, maybe return NULL or an error code
+  // TODO: Handle the error properly, maybe return NULL or an error code
   }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   EvaluateStatement *evaluateStatement = calloc(1, sizeof(EvaluateStatement));
-  evaluateStatement->formulaName = formulaName;
-  evaluateStatement->valuationName = valuationName;
+  evaluateStatement->formulaName = strdup(formulaName);
+  evaluateStatement->valuationName = strdup(valuationName);
   return evaluateStatement;
 }
 
 AdequateStatement *CheckAdequacyAction(const char *opsetName) {
-  if (!find_symbol(currentCompilerState()->symbolTable, opsetName)) {
+  if (find_symbol(currentCompilerState()->symbolTable, opsetName) == NULL) {
     logError(_logger, "Opset '%s' is not defined.", opsetName);
     currentCompilerState()->succeed = false;
     // TODO: Handle the error properly, maybe return NULL or an error code
   }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   AdequateStatement *adequateStatement = calloc(1, sizeof(AdequateStatement));
-  adequateStatement->opsetName = opsetName;
+  adequateStatement->opsetName = strdup(opsetName);
   return adequateStatement;
 }
 
@@ -269,7 +269,7 @@ DefineFormula *DefineFormulaAction(const char *name, Expression *expression) {
   }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   DefineFormula *defineFormula = calloc(1, sizeof(DefineFormula));
-  defineFormula->name = name;
+  defineFormula->name = strdup(name);
   defineFormula->expression = expression;
   return defineFormula;
 }
@@ -285,7 +285,7 @@ DefineValuation *DefineValuationAction(const char *name,
   }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   DefineValuation *defineValuation = calloc(1, sizeof(DefineValuation));
-  defineValuation->name = name;
+  defineValuation->name = strdup(name);
   defineValuation->valuationList = valuationList;
   return defineValuation;
 }
@@ -302,17 +302,22 @@ DefineOperator *DefineOperatorAction(CustomOperator *customOperator,
 CustomOperator *DefineCustomOperatorAction(const char *name,
                                            VariableList *variableList) {
 
-  if (!insert_symbol(&currentCompilerState()->symbolTable, name, SYMBOL_OPERATOR,
-                     // TODO: Add the number of arguments for the operator
-                     0)) {
-    logError(_logger, "Failed to insert operator '%s' into symbol table.",
-             name);
+  if (!insert_symbol(&currentCompilerState()->symbolTable, name, SYMBOL_OPERATOR, list_size(variableList))) {
+    logError(_logger, "Failed to insert operator '%s' into symbol table.", name);
     currentCompilerState()->succeed = false;
     // TODO: Handle the error properly, maybe return NULL or an error code
   }
+  VariableList *aux = variableList;
+  while (aux != NULL) { // Quiero quitar las variables del CustomOperator de la tabla, no me sirven
+    if (!remove_symbol(&currentCompilerState()->symbolTable, aux->variable)) {
+      logError(_logger, "Custom operator '%s' could not be created.", name);
+      currentCompilerState()->succeed = false;
+    }
+    aux = aux->next;
+  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   CustomOperator *customOperator = calloc(1, sizeof(CustomOperator));
-  customOperator->name = name;
+  customOperator->name = strdup(name);
   customOperator->variableList = variableList;
 
   return customOperator;
@@ -327,7 +332,7 @@ DefineOpset *DefineOpsetAction(const char *name, OpsetList *opsetList) {
   }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   DefineOpset *defineOpset = calloc(1, sizeof(DefineOpset));
-  defineOpset->name = name;
+  defineOpset->name = strdup(name);
   defineOpset->opsetList = opsetList;
   return defineOpset;
 }
@@ -402,6 +407,7 @@ Program *ProgramStatementSemanticAction(CompilerState *compilerState,
   program->next = nextProgram;
 
   compilerState->abstractSyntaxtTree = program;
+
   if (0 < flexCurrentContext()) {
     logError(_logger, "The final context is not the default (0): %d",
              flexCurrentContext());
@@ -409,5 +415,19 @@ Program *ProgramStatementSemanticAction(CompilerState *compilerState,
   } else {
     compilerState->succeed = true;
   }
+
+  if(!CheckTypeProgram(program)) {
+    logError(_logger, "Type checking failed for the program.");
+    compilerState->succeed = false;
+  }
+
   return program;
+}
+
+void logPointer(void * pointer){
+  logError(_logger, "Freeing pointer '%p' in destructor", pointer);
+}
+
+void logNameAndPointer(const char *name, void *pointer) {
+  logError(_logger, "Freeing pointer '%s' with address '%p' in .y.", name, pointer);
 }

@@ -1,1 +1,2 @@
+define variable p;
 define valuation myVal = { p = true };
