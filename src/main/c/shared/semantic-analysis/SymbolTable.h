@@ -1,9 +1,9 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
-#include "HashMap.h"
-#include "Type.h"
-#include "../frontend/syntactic-analysis/AbstractSyntaxTree.h"
+#include "../HashMap.h"
+#include "../Type.h"
+#include "../../frontend/syntactic-analysis/AbstractSyntaxTree.h"
 
 typedef enum {
   SYMBOL_VARIABLE,

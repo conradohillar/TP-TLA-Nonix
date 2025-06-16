@@ -65,8 +65,8 @@ add_executable(Compiler
 	src/main/c/frontend/syntactic-analysis/BisonActions.c
 	src/main/c/frontend/syntactic-analysis/BisonParser.c
 	src/main/c/frontend/syntactic-analysis/SyntacticAnalyzer.c
-	src/main/c/shared/SymbolTable.c
-	src/main/c/shared/TypeChecking.c
+	src/main/c/shared/semantic-analysis/SymbolTable.c
+	src/main/c/shared/semantic-analysis/TypeChecking.c
 	src/main/c/shared/Environment.c
 	src/main/c/shared/Logger.c
 	src/main/c/shared/String.c

@@ -21,7 +21,7 @@ define operator XOR(x, y) = {
     (false, false) -> false;
 };
 
-define formula myForm2 = ((${myForm1} | (s => q)) & XOR(p, q));
+define formula myForm2 = ((${myForm1} | (s => q)) & XOR(p, s));
 
 /*
     Definición de una valuación:

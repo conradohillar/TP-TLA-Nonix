@@ -1,9 +1,9 @@
 #ifndef TYPE_CHECKING_HEADER
 #define TYPE_CHECKING_HEADER
 
-#include "../frontend/syntactic-analysis/AbstractSyntaxTree.h"
+#include "../../frontend/syntactic-analysis/AbstractSyntaxTree.h"
 #include "SymbolTable.h"
-#include "../frontend/syntactic-analysis/SyntacticAnalyzer.h"
+#include "../../frontend/syntactic-analysis/SyntacticAnalyzer.h"
 
 unsigned int CheckTypeProgram(Program *program);
 

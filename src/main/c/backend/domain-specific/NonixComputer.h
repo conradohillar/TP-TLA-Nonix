@@ -9,8 +9,8 @@
 #include "../../frontend/syntactic-analysis/AbstractSyntaxTree.h"
 #include "../../shared/Logger.h"
 #include "../../shared/Type.h"
-#include "../../shared/TypeChecking.h"
-#include "../../shared/SymbolTable.h"
+#include "../../shared/semantic-analysis/TypeChecking.h"
+#include "../../shared/semantic-analysis/SymbolTable.h"
 #include <limits.h>
 
 /** Initialize module's internal state. */
