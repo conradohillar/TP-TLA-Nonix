@@ -1,0 +1,6 @@
+define operator myOp(x) = {
+    (true) -> true;
+    false otherwise;
+};
+define variable p, q;
+define formula myForm = (myOp(q) => p);

@@ -1,0 +1,3 @@
+define variable p, q;
+define formula myForm1 = (p & q);
+define formula myForm2 = ((${myForm1} | p) & q);
