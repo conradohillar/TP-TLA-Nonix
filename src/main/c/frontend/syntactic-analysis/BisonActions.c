@@ -186,11 +186,6 @@ ValuationList *ValuationListAction(ValuationList *valuationList,
 }
 
 Valuation *ValuationAction(Variable variable, TruthValue *truthValue) {
-  if (find_symbol(currentCompilerState()->symbolTable, variable) == NULL) {
-    logError(_logger, "Variable '%s' is not defined.", variable);
-    currentCompilerState()->succeed = false;
-  //TODO: Handle the error properly, maybe return NULL or an error code
-  }
   _logSyntacticAnalyzerAction(__FUNCTION__);
   Valuation *valuation = calloc(1, sizeof(Valuation));
   valuation->variable = strdup(variable);
@@ -252,7 +247,7 @@ DefineVariable *DefineVariableAction(VariableList *variableList) {
   _logSyntacticAnalyzerAction(__FUNCTION__);
   VariableList *aux = variableList;
   while (aux != NULL) {
-    if (!insert_symbol(&currentCompilerState()->symbolTable, aux->variable, 0, SYMBOL_VARIABLE)) {
+    if (!insert_symbol(&currentCompilerState()->symbolTable, aux->variable, 0, NULL, SYMBOL_VARIABLE)) {
       logError(_logger, "Failed to insert variable '%s' into symbol table.", aux->variable);
       currentCompilerState()->succeed = false;
     }
@@ -264,7 +259,7 @@ DefineVariable *DefineVariableAction(VariableList *variableList) {
 }
 
 DefineFormula *DefineFormulaAction(const char *name, Expression *expression) {
-  if (!insert_symbol(&currentCompilerState()->symbolTable, name, 0, SYMBOL_FORMULA)) {
+  if (!insert_symbol(&currentCompilerState()->symbolTable, name, 0, expression, SYMBOL_FORMULA)) {
     logError(_logger, "Failed to insert formula '%s' into symbol table.", name);
     currentCompilerState()->succeed = false;
     // TODO: Handle the error properly, maybe return NULL or an error code
@@ -276,9 +271,8 @@ DefineFormula *DefineFormulaAction(const char *name, Expression *expression) {
   return defineFormula;
 }
 
-DefineValuation *DefineValuationAction(const char *name,
-                                       ValuationList *valuationList) {
-  if (!insert_symbol(&currentCompilerState()->symbolTable, name, 0, SYMBOL_VALUATION)) {
+DefineValuation *DefineValuationAction(const char *name, ValuationList *valuationList) {
+  if (!insert_symbol(&currentCompilerState()->symbolTable, name, 0, valuationList, SYMBOL_VALUATION)) {
     logError(_logger, "Failed to insert valuation '%s' into symbol table.",
              name);
     currentCompilerState()->succeed = false;
@@ -293,7 +287,7 @@ DefineValuation *DefineValuationAction(const char *name,
 
 DefineOperator *DefineOperatorAction(CustomOperator *customOperator,
                                      TruthTable *truthTable) {
-  if (!insert_symbol(&currentCompilerState()->symbolTable, customOperator->name, list_size(customOperator->variableList), SYMBOL_OPERATOR)) {
+  if (!insert_symbol(&currentCompilerState()->symbolTable, customOperator->name, list_size(customOperator->variableList), truthTable, SYMBOL_OPERATOR)) {
     logError(_logger, "Failed to insert operator '%s' into symbol table.", customOperator->name);
     currentCompilerState()->succeed = false;
     // TODO: Handle the error properly, maybe return NULL or an error code
@@ -316,7 +310,7 @@ CustomOperator *DefineCustomOperatorAction(const char *name,
 }
 
 DefineOpset *DefineOpsetAction(const char *name, OpsetList *opsetList) {
-  if (!insert_symbol(&currentCompilerState()->symbolTable, name, 0, SYMBOL_OPSET)) {
+  if (!insert_symbol(&currentCompilerState()->symbolTable, name, 0, opsetList, SYMBOL_OPSET)) {
     logError(_logger, "Failed to insert opset '%s' into symbol table.", name);
     currentCompilerState()->succeed = false;
     // TODO : Handle the error properly, maybe return NULL or an error code

@@ -204,7 +204,7 @@ unsigned int CheckTypeOperator(Operator operatorName, int count) {
             || strcmp(operatorName, "<=>") == 0
             || strcmp(operatorName, "!") == 0;
     }
-    return symbolEntry->type == SYMBOL_OPERATOR && ((count < 0) ? 1 : (symbolEntry->argc == count)); // Decisión de diseño: si el count es -1, no se verifica el número de argumentos
+    return symbolEntry->type == SYMBOL_OPERATOR && ((count < 0) ? 1 : (symbolEntry->data.operator_data.argc == count)); // Decisión de diseño: si el count es -1, no se verifica el número de argumentos
 }
 
 unsigned int CheckTypeValuationName(const char * valuationName) {

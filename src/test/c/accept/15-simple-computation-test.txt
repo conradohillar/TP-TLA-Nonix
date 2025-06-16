@@ -1,0 +1,37 @@
+/* 
+    Definición de tres variables (se puede definir de a una o de a varias): 
+*/
+define variable p;
+define variable q, s;
+
+
+/*
+    Definición de fórmula
+*/
+define formula myForm1 = (p & !q);
+
+
+/*
+    Crear un conectivo nuevo (XOR) usando una tabla de verdad:
+*/
+define operator XOR(x, y) = {
+    (true,  true)  -> false;
+    (true,  false) -> true;
+    (false, true)  -> true;
+    (false, false) -> false;
+};
+
+define formula myForm2 = ((${myForm1} | (s => q)) & XOR(p, q));
+
+/*
+    Definición de una valuación:
+*/
+define valuation myVal =  { p = true, q = true, s = false };
+
+
+/*
+    Evaluación de la valuación
+*/
+evaluate(myForm2, myVal);
+
+

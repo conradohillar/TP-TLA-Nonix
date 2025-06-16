@@ -1,5 +1,5 @@
 #include "backend/code-generation/Generator.h"
-//#include "backend/domain-specific/Calculator.h"
+#include "backend/domain-specific/NonixComputer.h"
 #include "frontend/lexical-analysis/FlexActions.h"
 #include "frontend/syntactic-analysis/AbstractSyntaxTree.h"
 #include "frontend/syntactic-analysis/BisonActions.h"
@@ -20,7 +20,7 @@ const int main(const int count, const char ** arguments) {
 	initializeBisonActionsModule();
 	initializeSyntacticAnalyzerModule();
 	initializeAbstractSyntaxTreeModule();
-	//initializeCalculatorModule();
+	initializeNonixComputerModule();
 	initializeGeneratorModule();
 
 	// Logs the arguments of the application.
@@ -40,12 +40,13 @@ const int main(const int count, const char ** arguments) {
 	if (syntacticAnalysisStatus == ACCEPT) {
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
-		/* logDebugging(logger, "Computing expression value...");
+		logDebugging(logger, "Computing expression value...");
 		Program * program = compilerState.abstractSyntaxtTree;
-		ComputationResult computationResult = computeExpression(program->expression);
+		ComputationResult computationResult = computeProgram(program, compilerState.symbolTable);
 		if (computationResult.succeed) {
 			compilerState.value = computationResult.value;
 			generate(&compilerState);
+			printf("The computed value of the program is: %d\n\n", compilerState.value);
 		}
 		else {
 			logError(logger, "The computation phase rejects the input program.");
@@ -53,8 +54,7 @@ const int main(const int count, const char ** arguments) {
 		}
 		// ...end of the Backend. -----------------------------------------------------------------
 		// ----------------------------------------------------------------------------------------
-		logDebugging(logger, "Releasing AST resources..."); */
-		generate(&compilerState);
+		logDebugging(logger, "Releasing AST resources...");
 		releaseProgram(compilerState.abstractSyntaxtTree);
 	}
 	else {
@@ -63,14 +63,13 @@ const int main(const int count, const char ** arguments) {
 	}
 
 	// Release resources.
-	//releaseProgram(compilerState.abstractSyntaxtTree);
 	if (compilerState.symbolTable != NULL) {
 		free_symbol_table(&compilerState.symbolTable);
 	}
 
 	logDebugging(logger, "Releasing modules resources...");
 	shutdownGeneratorModule();
-	// shutdownCalculatorModule();
+	shutdownNonixComputerModule();
 	shutdownAbstractSyntaxTreeModule();
 	shutdownSyntacticAnalyzerModule();
 	shutdownBisonActionsModule();
