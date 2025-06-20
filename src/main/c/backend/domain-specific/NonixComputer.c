@@ -20,6 +20,7 @@ static LogicalBinaryOperator _expressionTypeToBinaryOperator(const BinaryOperato
 static boolean computeTruthValueOrWildcard(const TruthValueOrWildcard * truthValueOrWildcard);
 static ComputationResult _invalidComputation();
 static ComputationResult _invalidOperator(const boolean leftExpression, const boolean rightExpression);
+static ComputedValue * _addResult(ComputedValue * list, boolean result);
 
 /**
  * Converts and expression type to the proper binary operator. If that's not
@@ -37,23 +38,35 @@ static LogicalBinaryOperator _expressionTypeToBinaryOperator(const BinaryOperato
 			return _invalidOperator;
 	}
 }
-
 /**
- * A binary operator that always returns an invalid computation result.
+ * A computation that always returns an invalid result.
  */
 static ComputationResult _invalidOperator(const boolean leftExpression, const boolean rightExpression) {
 	return _invalidComputation();
 }
 
-/**
- * A computation that always returns an invalid result.
- */
 static ComputationResult _invalidComputation() {
 	ComputationResult computationResult = {
 		.succeed = false,
 		.value = 0
 	};
 	return computationResult;
+}
+
+static ComputedValue * _addResult(ComputedValue * list, boolean result) {
+	if(list == NULL) {
+		// If the list is empty, create a new node.
+		ComputedValue * newNode = (ComputedValue *)malloc(sizeof(ComputedValue));
+		if (newNode == NULL) {
+			logError(_logger, "Memory allocation failed for ComputedValue.");
+			return NULL;
+		}
+		newNode->result = result;
+		newNode->next = NULL;
+		return newNode;
+	}
+	list->next = _addResult(list->next, result);
+	return list;
 }
 
 /** PUBLIC FUNCTIONS */
@@ -296,29 +309,44 @@ ComputationResult computeAdequateStatement(AdequateStatement * adequateStatement
 	}; // Return an invalid computation result for now.
 }
 
-ComputationResult computeProgram(Program * program, SymbolEntry * symbolTable) {
-	ComputationResult result = {
-		.succeed = true,
-		.value = 1
-	};
+ComputedValue * computeProgram(Program * program, SymbolEntry * symbolTable, boolean * isValidProgram) {
+	ComputedValue * results_list = NULL;
 
 	Program * currentProgram = program;
 	while(currentProgram != NULL) {
-		switch (currentProgram->statement->type) {
+		switch(currentProgram->statement->type) {
 			case EVALUATE_STATEMENT: {
-				return computeEvaluateStatement(currentProgram->statement->evaluateStatement, symbolTable);
+				ComputationResult result = computeEvaluateStatement(currentProgram->statement->evaluateStatement, symbolTable);
+				if (!result.succeed) {
+					logError(_logger, "Failed to compute evaluate statement.");
+					*isValidProgram = false; // Mark the program as invalid.
+					return NULL;
+				}
+				results_list = _addResult(results_list, result.value);
+				break;
 			}
 			case ADEQUATE_STATEMENT: {
-				return computeAdequateStatement(currentProgram->statement->adequateStatement, symbolTable);
+				ComputationResult result = computeAdequateStatement(currentProgram->statement->adequateStatement, symbolTable);
+				if (!result.succeed) {
+					logError(_logger, "Failed to compute adequate statement.");
+					*isValidProgram = false; // Mark the program as invalid.
+					return NULL;
+				}
+				results_list = _addResult(results_list, result.value);
+				break;
 			}
 			default:
-				result.succeed = true;
+				break;
 		}
-		currentProgram = currentProgram->next;	
+		currentProgram = currentProgram->next;
 	}
-	// if(!result.succeed) {
-	// 	logError(_logger, "No valid computation statement found in the program.");
-	// 	return _invalidComputation();
-	// }
-	return result;
+	return results_list;
+}
+
+void free_results_list(ComputedValue * list) {
+	if(list == NULL) {
+		return; 
+	}
+	free(list->next);
+	free(list);
 }
