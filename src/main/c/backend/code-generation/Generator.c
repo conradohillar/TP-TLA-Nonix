@@ -5,16 +5,26 @@
 const char _indentationCharacter = ' ';
 const char _indentationSize = 4;
 static Logger * _logger = NULL;
+static FILE * _outputFile = NULL;
 
 void initializeGeneratorModule() {
 	_logger = createLogger("Generator");
+	_outputFile = fopen("output.tex", "w"); // o cualquier nombre
+	if (_outputFile == NULL) {
+		logError(_logger, "Cannot open output file");
+		exit(1);
+	}
 }
 
 void shutdownGeneratorModule() {
+	if (_outputFile != NULL) {
+		fclose(_outputFile);
+	}
 	if (_logger != NULL) {
 		destroyLogger(_logger);
 	}
 }
+
 
 /** PRIVATE FUNCTIONS */
 static void _generateProgram(Program * program);
@@ -287,6 +297,47 @@ static void _generateProgram(Program * program) {
 }
 
 /**
+ * Creates the prologue of the generated output, a Latex document that renders
+ * a tree thanks to the Forest package.
+ *
+ * @see https://ctan.dcc.uchile.cl/graphics/pgf/contrib/forest/forest-doc.pdf
+ */
+static void _generatePrologue(void) {
+	_output(0, "%s",
+    "\\documentclass{article}\n"
+    "\\usepackage[utf8]{inputenc}\n"
+    "\\usepackage[T1]{fontenc}\n"
+    "\\usepackage{amsmath}\n"
+    "\\usepackage{microtype}\n"
+    "\\usepackage{listings}\n"
+    "\\usepackage{xcolor}\n"
+    "\\usepackage{tcolorbox}\n"
+    "\\title{Output del compilador}\n"
+    "\\date{}\n"
+    "\\definecolor{codegray}{gray}{0.95}\n"
+    "\\lstdefinestyle{mystyle}{backgroundcolor=\\color{codegray},basicstyle=\\ttfamily\\small,frame=single,columns=fullflexible,keepspaces=true}\n"
+    "\\begin{document}\n"
+    "\\maketitle\n"
+    "\\section*{Código generado}\n"
+    "\\begin{lstlisting}[style=mystyle]\n"
+);
+
+}
+
+/**
+ * Creates the epilogue of the generated output, that is, the final lines that
+ * completes a valid Latex document.
+ */
+static void _generateEpilogue(const int value) {
+	_output(0, "\\end{lstlisting}\n\n");
+	_output(0, "\\section*{Resultado}\n");
+	_output(0, "\\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Resultado de evaluación]\n");
+	_output(0, "%d\n", value);
+	_output(0, "\\end{tcolorbox}\n\n\\end{document}\n");
+
+}
+
+/**
  * Generates an indentation string for the specified level.
  */
 static char * _indentation(const unsigned int level) {
@@ -303,8 +354,8 @@ static void _output(const unsigned int indentationLevel, const char * const form
 	va_start(arguments, format);
 	char * indentation = _indentation(indentationLevel);
 	char * effectiveFormat = concatenate(2, indentation, format);
-	vfprintf(stdout, effectiveFormat, arguments);
-	fflush(stdout);
+	vfprintf(_outputFile, effectiveFormat, arguments);
+	fflush(_outputFile);
 	free(effectiveFormat);
 	free(indentation);
 	va_end(arguments);
@@ -313,9 +364,9 @@ static void _output(const unsigned int indentationLevel, const char * const form
 /** PUBLIC FUNCTIONS */
 void generate(CompilerState * compilerState) {
 	logDebugging(_logger, "Generating final output...");
-	_output(0, "%s", "\n");
+	_generatePrologue();
 	_generateProgram(compilerState->abstractSyntaxtTree);
-	_output(0, "%s", "\n");
+	_generateEpilogue(compilerState->value);
 	logDebugging(_logger, "Generation is done.");
 
 }
