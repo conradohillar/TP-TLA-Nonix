@@ -148,16 +148,8 @@ static void _generateCustomExpression(const unsigned int indentationLevel, Custo
 			_output(indentationLevel, "%s", "}");
 			break;
 		case CUSTOM_OPERATOR:
-			_output(indentationLevel, "%s", customExpression->customOperator->name);
-			_output(indentationLevel, "%s", "(");
-			VariableList * variableList = customExpression->customOperator->variableList;
-			while (variableList != NULL) {
-				_output(indentationLevel, "%s", variableList->variable);
-				if (variableList->next != NULL) {
-					_output(indentationLevel, "%s", ", ");
-				}
-				variableList = variableList->next;
-			}
+			_output(indentationLevel, "%s(", customExpression->customOperator->name);
+			_generateVariableList(indentationLevel, customExpression->customOperator->variableList);
 			_output(indentationLevel, "%s", ")");
 			break;
 		default:

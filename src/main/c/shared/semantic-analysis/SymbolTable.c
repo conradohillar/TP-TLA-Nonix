@@ -71,18 +71,6 @@ boolean update_data_node(SymbolEntry *table, const char *name, void *new_data_no
   return true;
 }
 
-
-boolean remove_symbol(SymbolEntry **table, const char *name) {
-  SymbolEntry *s = find_symbol(*table, name);
-  if (s == NULL) {
-    return false;
-  }
-  HASH_DEL(*table, s); 
-  free((void *)s->name);
-  free(s);
-  return true; 
-}
-
 void free_symbol_table(SymbolEntry **table) {
   SymbolEntry *s, *tmp;
   HASH_ITER(hh, *table, s, tmp) {

@@ -169,13 +169,12 @@ ComputationResult computeCustomExpression(CustomExpression * customExpression, S
 }
 
 ComputationResult computeTruthTable(TruthTable * truthTable, VariableList * variableList, SymbolEntry * symbolTable) {
-    // 1. Contar el número de variables en la variableList para saber el tamaño del array.
     int num_vars_in_operator = list_size(variableList);
 
-    // 2. Crear un array temporal para los valores de verdad de las variables de la instancia del operador.
+    // Array temporal para los valores de verdad de las variables de la instancia del operador.
     boolean operator_var_truth_values[num_vars_in_operator];
 
-    // 3. Recorrer la variableList y obtener los valores de verdad de la tabla de símbolos.
+    // Se recorre la variableList y se obtienen los valores de verdad de la tabla de símbolos.
     VariableList *current_var_node = variableList;
     for (int i = 0; i < num_vars_in_operator && current_var_node != NULL; ++i) {
         SymbolEntry *symbol = find_symbol(symbolTable, current_var_node->variable);
@@ -192,12 +191,12 @@ ComputationResult computeTruthTable(TruthTable * truthTable, VariableList * vari
 		.value = false
 	};
 
-    // 4. Recorrer cada entrada (fila) de la truthTable.
+    // Se recorre cada entrada de la truthTable.
     TruthTable *current_row = truthTable;
     while (current_row != NULL) {
 		switch(current_row->entry->type) {
 			case TRUTH_VALUE_LIST:{
-        		// 5.1. Comparar los valores de verdad de la entrada actual con operator_var_truth_values.
+        		// Se comparan los valores de verdad de la entrada actual con operator_var_truth_values.
         		boolean match = true;
         		TruthValueList *entry_val_node = current_row->entry->truthValueList;
         		for (int i = 0; i < num_vars_in_operator; ++i) {
@@ -216,7 +215,7 @@ ComputationResult computeTruthTable(TruthTable * truthTable, VariableList * vari
 				break;
 			}
 			case OTHERWISE_ENTRY: {
-				// 5.2. Si llegamos a una entrada de tipo OTHERWISE, guardamos su valor en caso de que haya otra entrada más específica.
+				// Si se llega a una entrada de tipo OTHERWISE, se guarda su valor en caso de que haya otra entrada más específica.
 				result.succeed = true;
 				result.value = current_row->entry->otherwiseValue->value;
 				break;
@@ -229,12 +228,12 @@ ComputationResult computeTruthTable(TruthTable * truthTable, VariableList * vari
         current_row = current_row->next;
     }
 
-    // 6. Si no se encontró ninguna fila que coincida.
+    // Si no se encontró ninguna fila que coincida.
 	if(!result.succeed) {
     	logError(_logger, "No matching row found in truth table for the given variable values.");
     	return _invalidComputation();
 	}
-	// 7. Si se llegó hasta acá es por una entrada de tipo OTHERWISE, se devuelve su valor.
+	// Si se llegó hasta acá es por una entrada de tipo OTHERWISE, se devuelve su valor.
 	return result;
 }
 

@@ -37,8 +37,6 @@ SymbolEntry *find_symbol(SymbolEntry *table, const char *name);
 boolean update_variable_truth_value(SymbolEntry *table, const char *name, boolean new_truth_value);
 boolean update_data_node(SymbolEntry *table, const char *name, void *new_data_node);
 
-boolean remove_symbol(SymbolEntry **table, const char *name);
-
 void free_symbol_table(SymbolEntry **table);
 
 #endif

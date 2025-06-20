@@ -16,12 +16,12 @@ define formula myForm1 = (p & !q);
 */
 define operator XOR(x, y) = {
     (true,  true)  -> false;
-    (true,  false) -> true;
+    (true,  false) -> false;
     (false, true)  -> true;
     (false, false) -> false;
 };
 
-define formula myForm2 = ((${myForm1} | (s => q)) & XOR(s,p));
+define formula myForm2 = ((${myForm1} | (s => q)) & XOR(s,q));
 
 /*
     Definición de una valuación:
