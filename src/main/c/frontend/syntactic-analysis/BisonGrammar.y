@@ -240,16 +240,16 @@ expression: binaryExpression																		{ $$ = BinaryTypeAction($1); }
 																									}
     ;	
 
-binaryExpression: OPEN_PARENTHESIS expression[left] AND[op] expression[right] CLOSE_PARENTHESIS		{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_AND); if ($op) { free((void *)$op); }}
-	| OPEN_PARENTHESIS expression[left] OR[op] expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_OR);  if ($op) { free((void *)$op); }}
-	| OPEN_PARENTHESIS expression[left] THEN[op] expression[right] CLOSE_PARENTHESIS				{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_THEN); if ($op) { free((void *)$op); }}
-	| OPEN_PARENTHESIS expression[left] IFF[op] expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, $op, BINOP_IFF); if ($op) { free((void *)$op); }}
+binaryExpression: OPEN_PARENTHESIS expression[left] AND[op] expression[right] CLOSE_PARENTHESIS		{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_AND); if ($op) { free((void *)$op); }}
+	| OPEN_PARENTHESIS expression[left] OR[op] expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_OR);  if ($op) { free((void *)$op); }}
+	| OPEN_PARENTHESIS expression[left] THEN[op] expression[right] CLOSE_PARENTHESIS				{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_THEN); if ($op) { free((void *)$op); }}
+	| OPEN_PARENTHESIS expression[left] IFF[op] expression[right] CLOSE_PARENTHESIS					{ $$ = BinaryExpressionSemanticAction($left, $right, BINOP_IFF); if ($op) { free((void *)$op); }}
     ;
 
 customExpression: DOLLAR OPEN_BRACE IDENTIFIER CLOSE_BRACE 											{ $$ = PredefinedFormulaSemanticAction($3); if ($3) { free((void *)$3); }}
 	| customOperator																				{ $$ = CustomOperatorSemanticAction($1); }	 																		
 	;
 
-notExpression: NOT expression 																		{ $$ = NotExpressionSemanticAction($1, $2); if ($1) { free((void *)$1); }} 
+notExpression: NOT expression 																		{ $$ = NotExpressionSemanticAction($2); if ($1) { free((void *)$1); }} 
 	;
 %%

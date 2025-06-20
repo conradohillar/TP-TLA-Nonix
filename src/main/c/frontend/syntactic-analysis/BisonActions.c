@@ -89,7 +89,6 @@ TruthValue *TruthValueAction(boolean value) {
 BinaryExpression *
 BinaryExpressionSemanticAction(Expression *leftExpression,
                                Expression *rightExpression,
-                               Operator operator,
                                BinaryOperatorType operatorType) {
   _logSyntacticAnalyzerAction(__FUNCTION__);
 
@@ -123,7 +122,7 @@ CustomExpression *CustomOperatorSemanticAction(CustomOperator *customOperator) {
   return customExpression;
 }
 
-NotExpression *NotExpressionSemanticAction(Operator operator, Expression *expression) {
+NotExpression *NotExpressionSemanticAction(Expression *expression) {
   _logSyntacticAnalyzerAction(__FUNCTION__);
 
   NotExpression *notExpression = calloc(1, sizeof(NotExpression));
@@ -407,12 +406,4 @@ Program *ProgramStatementSemanticAction(CompilerState *compilerState,
   }
 
   return program;
-}
-
-void logPointer(void * pointer){
-  logError(_logger, "Freeing pointer '%p' in destructor", pointer);
-}
-
-void logNameAndPointer(const char *name, void *pointer) {
-  logError(_logger, "Freeing pointer '%s' with address '%p' in .y.", name, pointer);
 }
