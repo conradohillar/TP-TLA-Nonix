@@ -71,7 +71,7 @@ Token OnlyTokenLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Toke
   return token;
 }
 
-Token IdentifierSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token) {
+Token SemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token) {
   _logLexicalAnalyzerContext(__FUNCTION__, lexicalAnalyzerContext);
   lexicalAnalyzerContext->semanticValue->keywordOrSymbol = (const char *)strdup(lexicalAnalyzerContext->lexeme);
   destroyLexicalAnalyzerContext(lexicalAnalyzerContext);

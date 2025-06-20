@@ -32,7 +32,7 @@ Token UnknownLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext);
 
 Token OnlyTokenLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token);
 
-Token IdentifierSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token);
+Token SemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext, Token token);
 
 Token TrueSemanticValueLexemeAction(LexicalAnalyzerContext *lexicalAnalyzerContext);
 
