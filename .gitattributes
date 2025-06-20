@@ -93,3 +93,5 @@ Dockerfile text eol=lf
 *.ogg binary
 *.wav binary
 *.webm binary
+
+*.tex
