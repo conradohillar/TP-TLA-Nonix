@@ -312,12 +312,10 @@ static void _generatePrologue(void) {
     "\\usepackage{listings}\n"
     "\\usepackage{xcolor}\n"
     "\\usepackage{tcolorbox}\n"
-    "\\title{Output del compilador}\n"
     "\\date{}\n"
     "\\definecolor{codegray}{gray}{0.95}\n"
     "\\lstdefinestyle{mystyle}{backgroundcolor=\\color{codegray},basicstyle=\\ttfamily\\small,frame=single,columns=fullflexible,keepspaces=true}\n"
     "\\begin{document}\n"
-    "\\maketitle\n"
     "\\section*{Código generado}\n"
     "\\begin{lstlisting}[style=mystyle]\n"
 );
