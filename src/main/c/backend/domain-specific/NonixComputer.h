@@ -41,6 +41,7 @@ ComputationResult not_op(const boolean operand);
 ComputationResult computeExpression(Expression * expression, SymbolEntry * symbolTable);
 ComputationResult computeCustomExpression(CustomExpression * customExpression, SymbolEntry * symbolTable);
 ComputationResult computeTruthTable(TruthTable * truthTable, VariableList * variableList, SymbolEntry * symbolTable);
+ComputationResult computeTruthTableFromTruthValueArray(TruthTable *truthTable, boolean *truthValueArray, int varCount);
 ComputationResult computeEvaluateStatement(EvaluateStatement * evaluateStatement, SymbolEntry * symbolTable);
 ComputationResult computeAdequateStatement(AdequateStatement * adequateStatement, SymbolEntry * symbolTable);
 ComputationResult computeProgram(Program * program, SymbolEntry * symbolTable);
