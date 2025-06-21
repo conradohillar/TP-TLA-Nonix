@@ -2,8 +2,6 @@
 
 #define POST_FUNCTIONAL_COMPLETENESS_CLASSES 5
 
-#define MAX_LONG_LONG_INT 0xFFFFFFFFFFFFFFFF
-
 static boolean *bitMaskToBooleanArray(long long int bitMask, int varCount) {
   if (varCount > 64) {
     // TODO: Too many variables error
