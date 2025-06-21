@@ -5,6 +5,7 @@
 #include "../../shared/CompilerState.h"
 #include "../../shared/Logger.h"
 #include "../../shared/String.h"
+#include "../domain-specific/NonixComputer.h"
 #include <stdarg.h>
 #include <stdio.h>
 
