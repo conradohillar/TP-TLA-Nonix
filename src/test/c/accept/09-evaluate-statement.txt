@@ -1,5 +1,4 @@
 define variable p, q, r, s;
 define valuation myVal = { p = true, q = false, r = false, s = false};
-define variable x, y;
-define formula myForm = ((x | (!x & y)) & ((x | !y) | !(x & y)));
+define formula myForm = ((p | (!q & r)) & ((r | !p) | !(s & q)));
 evaluate(myForm, myVal);

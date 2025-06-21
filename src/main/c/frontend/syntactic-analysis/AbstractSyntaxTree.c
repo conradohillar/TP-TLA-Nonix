@@ -18,18 +18,19 @@ void shutdownAbstractSyntaxTreeModule() {
 
 void releaseProgram(Program * program) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
-	if (program != NULL) {
-		if(program->next != NULL) {
-			releaseProgram(program->next);
+	if(program != NULL) {
+		if (program != NULL) {
+			if(program->next != NULL) {
+				releaseProgram(program->next);
+			}
+			releaseStatement(program->statement);
+			free((void *)program);
 		}
-		releaseStatement(program->statement);
-		free((void *)program);
 	}
 }
 
 void releaseStatement(Statement * statement) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
-
 	if (statement != NULL) {
 		switch (statement->type) {
 			case DEFINE_VARIABLE:
@@ -71,9 +72,12 @@ void releaseExpression(Expression * expression){
 			case CUSTOM_EXPRESSION:
 				releaseCustomExpression(expression->customExpression);
 				break;
-			case VARIABLE_EXPRESSION:
-				free((void *)expression->variable);
+			case VARIABLE_EXPRESSION:{
+				if(expression->variable != NULL){
+					free((void *)expression->variable);
+				}
 				break;
+			}
 		}
 		free((void *)expression);
 	}
@@ -100,9 +104,12 @@ void releaseCustomExpression(CustomExpression * customExpression) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (customExpression != NULL) {
 		switch (customExpression->type) {
-			case PREDEFINED_FORMULA:
-				free((void *)customExpression->predefinedFormula);
+			case PREDEFINED_FORMULA:{
+				if(customExpression->predefinedFormula != NULL) {
+					free((void *)customExpression->predefinedFormula);
+				}
 				break;
+			}
 			case CUSTOM_OPERATOR:
 				releaseCustomOperator(customExpression->customOperator);
 				break;
@@ -123,7 +130,9 @@ void releaseVariableList(VariableList * variableList) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (variableList != NULL) {
 		releaseVariableList(variableList->next);
-		free((void *)variableList->variable);
+		if(variableList->variable != NULL) {
+			free((void *)variableList->variable);
+		}
 		free((void *)variableList);
 	}
 }
@@ -132,7 +141,9 @@ void releaseDefineFormula(DefineFormula * defineFormula) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (defineFormula != NULL) {
 		releaseExpression(defineFormula->expression);
-		free((void *)defineFormula->name);
+		if(defineFormula->name != NULL) {
+			free((void *)defineFormula->name);
+		}
 		free((void *)defineFormula);
 	}
 }
@@ -141,7 +152,9 @@ void releaseDefineValuation(DefineValuation * defineValuation) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (defineValuation != NULL) {
 		releaseValuationList(defineValuation->valuationList);
-		free((void *)defineValuation->name);
+		if(defineValuation->name != NULL) {
+			free((void *)defineValuation->name);
+		}
 		free((void *)defineValuation);
 	}
 }
@@ -159,7 +172,9 @@ void releaseValuation(Valuation * valuation) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (valuation != NULL) {
 		releaseTruthValue(valuation->truthValue);
-		free((void *)valuation->variable);
+		if(valuation->variable != NULL) {
+			free((void *)valuation->variable);
+		}
 		free((void *)valuation);
 	}
 }
@@ -168,7 +183,9 @@ void releaseDefineOpset(DefineOpset * defineOpset) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (defineOpset != NULL) {
 		releaseOpsetList(defineOpset->opsetList);
-		free((void *)defineOpset->name);
+		if(defineOpset->name != NULL) {
+			free((void *)defineOpset->name);
+		}
 		free((void *)defineOpset);
 	}
 }
@@ -177,7 +194,9 @@ void releaseOpsetList(OpsetList * opsetList) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (opsetList != NULL) {
 		releaseOpsetList(opsetList->next);
-		free((void *)opsetList->operator);
+		if(opsetList->operator != NULL) {
+			free((void *)opsetList->operator);
+		}
 		free((void *)opsetList);
 	}
 }
@@ -195,7 +214,9 @@ void releaseCustomOperator(CustomOperator * customOperator) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (customOperator != NULL) {
 		releaseVariableList(customOperator->variableList);
-		free((void *)customOperator->name);
+		if(customOperator->name != NULL) {
+			free((void *)customOperator->name);
+		}
 		free((void *)customOperator);
 	}
 }
@@ -203,7 +224,9 @@ void releaseCustomOperator(CustomOperator * customOperator) {
 void releaseAdequateStatement(AdequateStatement * adequateStatement) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (adequateStatement != NULL) {
-		free((void *)adequateStatement->opsetName);
+		if(adequateStatement->opsetName != NULL) {
+			free((void *)adequateStatement->opsetName);
+		}
 		free((void *)adequateStatement);
 	}
 }
@@ -211,8 +234,12 @@ void releaseAdequateStatement(AdequateStatement * adequateStatement) {
 void releaseEvaluateStatement(EvaluateStatement * evaluateStatement) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (evaluateStatement != NULL) {
-		free((void *)evaluateStatement->formulaName);
-		free((void *)evaluateStatement->valuationName);
+		if(evaluateStatement->formulaName != NULL) {
+			free((void *)evaluateStatement->formulaName);
+		}
+		if(evaluateStatement->valuationName != NULL) {
+			free((void *)evaluateStatement->valuationName);
+		}
 		free((void *)evaluateStatement);
 	}
 }

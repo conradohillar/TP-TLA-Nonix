@@ -33,7 +33,7 @@ const int main(const int count, const char ** arguments) {
 		.abstractSyntaxtTree = NULL,
 		.symbolTable = NULL,
 		.succeed = false,
-		.value = 0
+		.result_values_list = NULL
 	};
 	const SyntacticAnalysisStatus syntacticAnalysisStatus = parse(&compilerState);
 	CompilationStatus compilationStatus = SUCCEED;
@@ -42,11 +42,14 @@ const int main(const int count, const char ** arguments) {
 		// Beginning of the Backend... ------------------------------------------------------------
 		logDebugging(logger, "Computing expression value...");
 		Program * program = compilerState.abstractSyntaxtTree;
-		ComputationResult computationResult = computeProgram(program, compilerState.symbolTable);
-		if (computationResult.succeed) {
-			compilerState.value = computationResult.value;
+		compilerState.result_values_list = computeProgram(program, compilerState.symbolTable, &compilerState.succeed);
+		if (compilerState.succeed) {
 			generate(&compilerState);
-			printf("The computed value of the program is: %d\n\n", compilerState.value);
+			ComputedValue * currentValue = compilerState.result_values_list;
+			while(currentValue != NULL) {
+				printf("%s\n", currentValue->result ? "true" : "false");
+				currentValue = currentValue->next;
+			}
 		}
 		else {
 			logError(logger, "The computation phase rejects the input program.");
@@ -63,7 +66,12 @@ const int main(const int count, const char ** arguments) {
 	}
 
 	// Release resources.
+	if(compilerState.result_values_list != NULL) {
+		logDebugging(logger, "Releasing results list resources...");
+		free_results_list(compilerState.result_values_list);
+	}
 	if (compilerState.symbolTable != NULL) {
+		logDebugging(logger, "Releasing symbol table resources...");
 		free_symbol_table(&compilerState.symbolTable);
 	}
 

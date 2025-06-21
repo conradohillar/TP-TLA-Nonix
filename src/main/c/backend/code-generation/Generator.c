@@ -312,12 +312,10 @@ static void _generatePrologue(void) {
     "\\usepackage{listings}\n"
     "\\usepackage{xcolor}\n"
     "\\usepackage{tcolorbox}\n"
-    "\\title{Output del compilador}\n"
     "\\date{}\n"
     "\\definecolor{codegray}{gray}{0.95}\n"
     "\\lstdefinestyle{mystyle}{backgroundcolor=\\color{codegray},basicstyle=\\ttfamily\\small,frame=single,columns=fullflexible,keepspaces=true}\n"
     "\\begin{document}\n"
-    "\\maketitle\n"
     "\\section*{Código generado}\n"
     "\\begin{lstlisting}[style=mystyle]\n"
 );
@@ -328,11 +326,15 @@ static void _generatePrologue(void) {
  * Creates the epilogue of the generated output, that is, the final lines that
  * completes a valid Latex document.
  */
-static void _generateEpilogue(const int value) {
+static void _generateEpilogue(ComputedValue * values) {
 	_output(0, "\\end{lstlisting}\n\n");
 	_output(0, "\\section*{Resultado}\n");
 	_output(0, "\\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Resultado de evaluación]\n");
-	_output(0, "%d\n", value);
+	ComputedValue * currentValue = values;
+	while (currentValue != NULL) {
+		_output(0, "%s\n", currentValue->result ? "true" : "false");
+		currentValue = currentValue->next;
+	}
 	_output(0, "\\end{tcolorbox}\n\n\\end{document}\n");
 
 }
@@ -366,7 +368,7 @@ void generate(CompilerState * compilerState) {
 	logDebugging(_logger, "Generating final output...");
 	_generatePrologue();
 	_generateProgram(compilerState->abstractSyntaxtTree);
-	_generateEpilogue(compilerState->value);
+	_generateEpilogue(compilerState->result_values_list);
 	logDebugging(_logger, "Generation is done.");
 
 }

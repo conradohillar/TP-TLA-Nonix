@@ -23,6 +23,12 @@ void shutdownNonixComputerModule();
  * The result of a computation. It's considered valid only if "succeed" is
  * true.
  */
+
+typedef struct ComputedValue {
+	boolean result; 		
+	struct ComputedValue *next;  
+} ComputedValue;
+
 typedef struct {
 	boolean succeed;
 	boolean value;
@@ -44,6 +50,8 @@ ComputationResult computeTruthTable(TruthTable * truthTable, VariableList * vari
 ComputationResult computeTruthTableFromTruthValueArray(TruthTable *truthTable, boolean *truthValueArray, int varCount);
 ComputationResult computeEvaluateStatement(EvaluateStatement * evaluateStatement, SymbolEntry * symbolTable);
 ComputationResult computeAdequateStatement(AdequateStatement * adequateStatement, SymbolEntry * symbolTable);
-ComputationResult computeProgram(Program * program, SymbolEntry * symbolTable);
+ComputedValue * computeProgram(Program * program, SymbolEntry * symbolTable, boolean * isValidProgram);
+
+void free_results_list(ComputedValue * results_list);
 
 #endif

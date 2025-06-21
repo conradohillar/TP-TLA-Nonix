@@ -25,11 +25,7 @@ typedef struct {
 	// A flag that indicates the current state of the compilation so far.
 	boolean succeed;
 
-	// TODO: Add an stack to handle nested scopes.
-	// TODO: Add configuration.
-
-	// The computed value of the entire program (only for the calculator).
-	int value;
+	void * result_values_list; // List of computed values, if any.
 } CompilerState;
 
 #endif
