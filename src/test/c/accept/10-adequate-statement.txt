@@ -13,5 +13,33 @@ define operator myOp4(x,y) = {
     (true, ?) -> true;
     false otherwise;
 };
-define opset myOpset = {myOp1, &, myOp2, myOp3, |, !, <=>, =>, myOp4};
-adequate(myOpset);
+
+
+
+define operator AND(x,y) = {
+    (true, true) -> true;
+    false otherwise;
+};
+
+define operator NOT(x) = {
+    (true) -> false;
+    (false) -> true;
+};
+
+define operator THEN(x, y) = {
+    (?, true) -> true;
+    (false, false) -> true;
+    false otherwise;
+};
+
+define opset adequateOpset = {myOp1, &, myOp2, myOp3, |, !, <=>, =>, myOp4};
+adequate(adequateOpset);
+
+define opset adequateOpset2 = { AND, THEN, NOT}; 
+adequate(adequateOpset2);
+
+define opset inadequateOpset = { AND, THEN};
+adequate(inadequateOpset);
+
+define opset inadequateOpset2 = { &, => };
+adequate(inadequateOpset2);
