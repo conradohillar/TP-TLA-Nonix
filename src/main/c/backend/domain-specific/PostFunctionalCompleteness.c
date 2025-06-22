@@ -40,13 +40,19 @@ int count_ones(unsigned long long int x) {
  */
 static boolean isClassI(Operator operator, int class,
                         SymbolEntry *symbolTable) {
+  TruthTable *truthTable;
+  int varCount;
+  if (strcmp(operator, "=>") != 0 && strcmp(operator, "<=>") != 0 &&
+      strcmp(operator, "!") != 0 && strcmp(operator, "&") != 0 &&
+      strcmp(operator, "|") != 0) {
 
-  SymbolEntry *tableEntry = find_symbol(symbolTable, operator);
-  if (tableEntry == NULL) {
-    return false;
+    SymbolEntry *tableEntry = find_symbol(symbolTable, operator);
+    if (tableEntry == NULL) {
+      return false;
+    }
+    truthTable = tableEntry->data.operator_data.truth_table;
+    varCount = tableEntry->data.operator_data.argc;
   }
-  TruthTable *truthTable = tableEntry->data.operator_data.truth_table;
-  int varCount = tableEntry->data.operator_data.argc;
 
   switch (class) {
     // Class 1
@@ -132,19 +138,24 @@ boolean isFunctionallyComplete(OpsetList *opset, SymbolEntry *symbolTable) {
 
   // For each class, we check if there is an operator that doesn't belong to
   // the class
+  char flag = 0;
   for (int i = 0; i < POST_FUNCTIONAL_COMPLETENESS_CLASSES; i++) {
     for (int j = 0; j < num_operators; j++) {
       // If there is an operator that doesn't belong to the class, the theorem
       // holds (for now) and we can try the next class
       if (!isClassI(aux->operator, i, symbolTable)) {
         aux = opset;
+        flag = 1;
         break;
       }
       aux = aux->next;
     }
     // If we've checked all operators and they all belong to the class, the
     // theorem doesn't hold, so we return false
-    return false;
+    if (flag == 0) {
+      return false;
+    }
+    flag = 0;
   }
   return true;
 }
