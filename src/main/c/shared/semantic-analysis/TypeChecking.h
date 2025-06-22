@@ -3,6 +3,7 @@
 
 #include "../../frontend/syntactic-analysis/AbstractSyntaxTree.h"
 #include "SymbolTable.h"
+#include "TruthValueMap.h"
 #include "../../frontend/syntactic-analysis/SyntacticAnalyzer.h"
 
 unsigned int CheckTypeProgram(Program *program);
@@ -44,8 +45,6 @@ unsigned int CheckTypeEvaluateStatement(EvaluateStatement *evaluateStatement);
 unsigned int CheckTypeTruthTable(TruthTable *truthTable, unsigned int args);
 
 unsigned int CheckTypeTruthTableEntry(TruthTableEntry *truthTableEntry, unsigned int args);
-
-unsigned int CheckTypeTruthValueList(TruthValueList *truthValueList);
 
 unsigned int CheckTypeTruthValueOrWildcard(TruthValueOrWildcard *truthValueOrWildcard);
 

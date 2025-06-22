@@ -208,26 +208,21 @@ ComputationResult computeTruthTable(TruthTable *truthTable,
   for (int i = 0; i < num_vars_in_operator && current_var_node != NULL; ++i) {
     SymbolEntry *symbol = find_symbol(symbolTable, current_var_node->variable);
     if (symbol == NULL || symbol->type != SYMBOL_VARIABLE) {
-      logError(_logger, "Variable '%s' not found in symbol table",
-               current_var_node->variable);
+      logError(_logger, "Variable '%s' not found in symbol table", current_var_node->variable);
       return _invalidComputation();
     }
     operator_var_truth_values[i] = symbol->data.truth_value;
     current_var_node = current_var_node->next;
   }
 
-  ComputationResult result = computeTruthTableFromTruthValueArray(
-      truthTable, operator_var_truth_values, num_vars_in_operator);
+  ComputationResult result = computeTruthTableFromTruthValueArray(truthTable, operator_var_truth_values, num_vars_in_operator);
 
   // Si no se encontró ninguna fila que coincida.
   if (!result.succeed) {
-    logError(
-        _logger,
-        "No matching row found in truth table for the given variable values.");
+    logError(_logger, "No matching row found in truth table for the given variable values.");
     return _invalidComputation();
   }
-  // Si se llegó hasta acá es por una entrada de tipo OTHERWISE, se devuelve su
-  // valor.
+ 
   return result;
 }
 
@@ -241,38 +236,32 @@ ComputationResult computeTruthTableFromTruthValueArray(TruthTable *truthTable,
   while (current_row != NULL) {
     switch (current_row->entry->type) {
     case TRUTH_VALUE_LIST: {
-      // Se comparan los valores de verdad de la entrada actual con
-      // truthValueArray.
+      // Se comparan los valores de verdad de la entrada actual con los del truthValueArray.
       boolean match = true;
       TruthValueList *entry_val_node = current_row->entry->truthValueList;
       for (int i = 0; i < varCount; ++i) {
-        if (computeTruthValueOrWildcard(entry_val_node->truthValueOrWildcard) !=
-            truthValueArray[i]) {
+        if (computeTruthValueOrWildcard(entry_val_node->truthValueOrWildcard) != truthValueArray[i]) {
           match = false;
           break;
         }
         entry_val_node = entry_val_node->next;
       }
 
-      if (match) {
+      if (match) { // Se encontró la fila que coincide.
         result.succeed = true;
-        result.value =
-            current_row->entry->mapValue
-                ->value; // Asignar el valor de verdad correspondiente.
-        return result;   // Se encontró la fila que coincide.
+        result.value = current_row->entry->mapValue->value; // Asignar el valor de verdad correspondiente.
+        return result;   
       }
       break;
     }
     case OTHERWISE_ENTRY: {
-      // Si se llega a una entrada de tipo OTHERWISE, se guarda su valor en caso
-      // de que haya otra entrada más específica.
+      // Si es OTHERWISE, se guarda su valor en caso de que haya otra entrada más específica.
       result.succeed = true;
       result.value = current_row->entry->otherwiseValue->value;
       break;
     }
     default:
-      logError(_logger, "Invalid TruthTableEntryType: %d",
-               current_row->entry->type);
+      logError(_logger, "Invalid TruthTableEntryType: %d", current_row->entry->type);
       return _invalidComputation();
     }
     // Avanzar a la siguiente fila de la truthTable.

@@ -2,6 +2,7 @@
 #define COMPILER_STATE_HEADER
 
 #include "semantic-analysis/SymbolTable.h"
+#include "semantic-analysis/TruthValueMap.h"
 
 /**
  * The general status of a compilation.
@@ -21,6 +22,9 @@ typedef struct {
 
 	// Symbol Table
 	SymbolEntry * symbolTable;
+
+	// Truth Value Map for type checking.
+	TruthValueMapEntry * truthValueMap;
 
 	// A flag that indicates the current state of the compilation so far.
 	boolean succeed;

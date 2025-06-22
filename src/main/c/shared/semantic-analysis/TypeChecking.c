@@ -1,6 +1,8 @@
 #include "TypeChecking.h"
 #include <math.h>
 
+static boolean has_otherwise_entry(TruthTable *truthTable);
+
 unsigned int CheckTypeProgram(Program *program) {
     if(program == NULL) {
         return 0;
@@ -124,8 +126,12 @@ unsigned int CheckTypeTruthTableEntry(TruthTableEntry *truthTableEntry, unsigned
         return 0;
     }
     switch (truthTableEntry->type) {
-        case TRUTH_VALUE_LIST:
-            return list_size(truthTableEntry->truthValueList) == args;
+        case TRUTH_VALUE_LIST:{
+            if(list_size(truthTableEntry->truthValueList) != args){
+                return 0;
+            }
+            return check_truth_value_entry(&currentCompilerState()->truthValueMap, truthTableEntry->truthValueList, args);
+        }
         case OTHERWISE_ENTRY:
             return 1;
         default:
@@ -232,4 +238,14 @@ unsigned int list_size(void * list) {
         }
     }
     return size;
+}
+
+static boolean has_otherwise_entry(TruthTable *truthTable) {
+    if (truthTable == NULL) {
+        return false;
+    }
+    if (truthTable->entry->type == OTHERWISE_ENTRY) {
+        return true;
+    }
+    return has_otherwise_entry(truthTable->next);
 }

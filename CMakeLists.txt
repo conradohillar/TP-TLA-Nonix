@@ -57,6 +57,7 @@ endif ()
 add_executable(Compiler
 	src/main/c/backend/code-generation/Generator.c
 	src/main/c/backend/domain-specific/NonixComputer.c
+	src/main/c/backend/domain-specific/PostFunctionalCompleteness.c
 	src/main/c/EntryPoint.c
 	src/main/c/frontend/lexical-analysis/FlexActions.c
 	src/main/c/frontend/lexical-analysis/FlexScanner.c
@@ -67,6 +68,7 @@ add_executable(Compiler
 	src/main/c/frontend/syntactic-analysis/SyntacticAnalyzer.c
 	src/main/c/shared/semantic-analysis/SymbolTable.c
 	src/main/c/shared/semantic-analysis/TypeChecking.c
+	src/main/c/shared/semantic-analysis/TruthValueMap.c
 	src/main/c/shared/Environment.c
 	src/main/c/shared/Logger.c
 	src/main/c/shared/String.c
