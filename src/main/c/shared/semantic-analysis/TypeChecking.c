@@ -98,8 +98,14 @@ unsigned int CheckTypeDefineOperator(DefineOperator *defineOperator) {
     unsigned int args = list_size(defineOperator->customOperator->variableList);
     unsigned int table_entries = list_size(defineOperator->truthTable);
 
-    return table_entries <= pow(2, args) && // Chequear que el número de entradas en la tabla de verdad no exceda 2^n, donde n es el número de argumentos
-           CheckTypeTruthTable(defineOperator->truthTable, args);
+    unsigned int valid = 0;
+    if (has_otherwise_entry(defineOperator->truthTable)){
+        valid = table_entries <= pow(2, args); // Si hay otherwise, que el número de entradas sea a lo sumo 2^n
+    } else {
+        valid = table_entries == pow(2, args); // Si no, que el número de entradas sea exactamente 2^n
+    }
+
+    return valid && CheckTypeTruthTable(defineOperator->truthTable, args);
 }
 
 unsigned int CheckTypeTruthTable(TruthTable *truthTable, unsigned int args) {
