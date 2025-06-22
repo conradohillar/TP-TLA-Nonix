@@ -346,13 +346,9 @@ ComputationResult computeAdequateStatement(AdequateStatement *adequateStatement,
     return _invalidComputation();
   }
   OpsetList *opset = symbol->data.opset_list;
-  if (isFunctionallyComplete(opset, symbolTable)) {
-    // TODO: VER QUE HAY QUE HACER CON EL RESULTADO ???
-  }
 
   return (ComputationResult){
-      .succeed = true,
-      .value = 1}; // Return an invalid computation result for now.
+      .succeed = true, .value = isFunctionallyComplete(opset, symbolTable)};
 }
 
 ComputedValue *computeProgram(Program *program, SymbolEntry *symbolTable,

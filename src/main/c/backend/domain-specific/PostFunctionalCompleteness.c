@@ -38,7 +38,7 @@ int count_ones(unsigned long long int x) {
  *   Given an operator and a class number, this function checks if the operator
  *   belongs to the class.
  */
-static boolean isClassI(Operator *operator, int class,
+static boolean isClassI(Operator operator, int class,
                         SymbolEntry *symbolTable) {
 
   SymbolEntry *tableEntry = find_symbol(symbolTable, operator);
@@ -134,7 +134,6 @@ boolean isFunctionallyComplete(OpsetList *opset, SymbolEntry *symbolTable) {
   // the class
   for (int i = 0; i < POST_FUNCTIONAL_COMPLETENESS_CLASSES; i++) {
     for (int j = 0; j < num_operators; j++) {
-      int varCount = list_size(aux->operator);
       // If there is an operator that doesn't belong to the class, the theorem
       // holds (for now) and we can try the next class
       if (!isClassI(aux->operator, i, symbolTable)) {
