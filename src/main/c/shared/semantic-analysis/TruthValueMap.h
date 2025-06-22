@@ -14,6 +14,7 @@ typedef struct TruthValueMapEntry {
 boolean check_truth_value_entry(TruthValueMapEntry **truthValueMap, TruthValueList *truthValueList, unsigned int n_vars);
 boolean insert_combination(TruthValueMapEntry **table, unsigned long long combination);
 TruthValueMapEntry *find_combination(TruthValueMapEntry *table, unsigned long long combination);
+unsigned int size(TruthValueMapEntry *table);
 void free_truth_value_map(TruthValueMapEntry **table);
 
 

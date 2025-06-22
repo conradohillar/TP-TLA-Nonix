@@ -1,8 +1,8 @@
 #include "TruthValueMap.h"
 
-static void truth_value_list_to_keys(const TruthValueList *list, unsigned long long key_prefix, int n_vars, unsigned long long *out_keys, int *out_count, unsigned int max_keys);
+static void truth_value_list_to_keys(const TruthValueList *list, unsigned long long key_prefix, int bit_pos, unsigned long long *out_keys, int *out_count, unsigned int max_keys);
 
-static void truth_value_list_to_keys(const TruthValueList *list, unsigned long long key_prefix, int n_vars, unsigned long long *out_keys, int *out_count, unsigned int max_keys) {
+static void truth_value_list_to_keys(const TruthValueList *list, unsigned long long key_prefix, int bit_pos, unsigned long long *out_keys, int *out_count, unsigned int max_keys) {
     if (list == NULL) {
         // Caso base: se llegó al final de la lista, guardar la clave generada
         if (*out_count < max_keys) {
@@ -11,16 +11,14 @@ static void truth_value_list_to_keys(const TruthValueList *list, unsigned long l
         }
         return;
     }
-    // Desplazar el prefijo para dejar lugar al siguiente bit
-    key_prefix = key_prefix << 1;
     if (list->truthValueOrWildcard->type == WILDCARD_VALUE) {
         // Probar con 0 (false)
-        truth_value_list_to_keys(list->next, key_prefix | 0, n_vars, out_keys, out_count, max_keys);
+        truth_value_list_to_keys(list->next, key_prefix, bit_pos + 1, out_keys, out_count, max_keys);
         // Probar con 1 (true)
-        truth_value_list_to_keys(list->next, key_prefix | 1, n_vars, out_keys, out_count, max_keys);
+        truth_value_list_to_keys(list->next, key_prefix | (1ULL << bit_pos), bit_pos + 1, out_keys, out_count, max_keys);
     } else {
         int bit = list->truthValueOrWildcard->truthValue->value ? 1 : 0;
-        truth_value_list_to_keys(list->next, key_prefix | bit, n_vars, out_keys, out_count, max_keys);
+        truth_value_list_to_keys(list->next, key_prefix | ((unsigned long long)bit << bit_pos), bit_pos + 1, out_keys, out_count, max_keys);
     }
 }
 
@@ -32,10 +30,9 @@ boolean check_truth_value_entry(TruthValueMapEntry **truthValueMap, TruthValueLi
     unsigned int max_keys = 1 << n_vars; // 2^n_vars
     unsigned long long *keys = malloc(max_keys * sizeof(unsigned long long));
     int count = 0;
-    truth_value_list_to_keys(truthValueList, 0, n_vars, keys, &count, max_keys);
+    truth_value_list_to_keys(truthValueList, 0, 0, keys, &count, max_keys);
     
     for(int i = 0; i < count; i++) {
-        printf("Checking combination: %llu\n", keys[i]);
         if (!insert_combination(truthValueMap, keys[i])) {
             free(keys);
             return false; // Combinación inválida
@@ -59,6 +56,10 @@ TruthValueMapEntry *find_combination(TruthValueMapEntry *table, unsigned long lo
     TruthValueMapEntry *entry;
     HASH_FIND(hh, table, &combination, sizeof(combination), entry);
     return entry;
+}
+
+unsigned int size(TruthValueMapEntry *table) {
+    return HASH_COUNT(table);
 }
 
 void free_truth_value_map(TruthValueMapEntry **table) {

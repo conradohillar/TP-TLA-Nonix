@@ -94,6 +94,7 @@
 %token <keywordOrSymbol> UNKNOWN
 
 /** Non-terminals. */
+%type <program> input
 %type <program> program
 %type <expression> expression
 %type <binaryExpression> binaryExpression
@@ -116,7 +117,7 @@
 %type <defineOpset> defineOpset
 %type <evaluateStatement> evaluateStatement
 %type <adequateStatement> adequateStatement
-%type <customOperator> customOperator
+%type <customOperator> customOperator 
 
 /**
  * Precedence and associativity.
@@ -130,6 +131,8 @@
 %%
 
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
+input: program 																						{ $$ = ProgramSemanticAction(currentCompilerState(), $1) ; }
+	;
 
 program: program statement SEMICOLON																{ $$ = ProgramStatementSemanticAction(currentCompilerState(), $1, $2); }
 	| statement SEMICOLON																			{ $$ = ProgramStatementSemanticAction(currentCompilerState(), NULL, $1); }

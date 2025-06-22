@@ -108,4 +108,6 @@ Program *ProgramStatementSemanticAction(CompilerState *compilerState,
                                         Program *nextProgram,
                                         Statement *statement);
 
+Program *ProgramSemanticAction(CompilerState *compilerState, Program *program);
+
 #endif

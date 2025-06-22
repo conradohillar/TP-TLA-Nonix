@@ -390,6 +390,11 @@ Program *ProgramStatementSemanticAction(CompilerState *compilerState,
   program->statement = statement;
   program->next = nextProgram;
 
+  return program;
+}
+
+Program *ProgramSemanticAction(CompilerState *compilerState, Program *program) {
+  _logSyntacticAnalyzerAction(__FUNCTION__);
   compilerState->abstractSyntaxtTree = program;
 
   if (0 < flexCurrentContext()) {
@@ -404,6 +409,6 @@ Program *ProgramStatementSemanticAction(CompilerState *compilerState,
     logError(_logger, "Type checking failed for the program.");
     compilerState->succeed = false;
   }
-
+  
   return program;
 }

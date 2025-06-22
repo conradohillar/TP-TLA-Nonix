@@ -47,6 +47,7 @@ static void _generateTruthTable(const unsigned int indentationLevel, TruthTable 
 static void _generateTruthTableEntry(const unsigned int indentationLevel, TruthTableEntry * entry);
 static void _generateTruthValueList(const unsigned int indentationLevel, TruthValueList * truthValueList);
 static void _generateTruthValueOrWildcard(const unsigned int indentationLevel, TruthValueOrWildcard * truthValueOrWildcard);
+static void _generateResults(ComputedValue * values);
 
 static char * _indentation(const unsigned int indentationLevel);
 static void _output(const unsigned int indentationLevel, const char * const format, ...);
@@ -330,13 +331,17 @@ static void _generateEpilogue(ComputedValue * values) {
 	_output(0, "\\end{lstlisting}\n\n");
 	_output(0, "\\section*{Resultado}\n");
 	_output(0, "\\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Resultado de evaluación]\n");
-	ComputedValue * currentValue = values;
-	while (currentValue != NULL) {
-		_output(0, "%s\n", currentValue->result ? "true" : "false");
-		currentValue = currentValue->next;
-	}
+	_generateResults(values);
 	_output(0, "\\end{tcolorbox}\n\n\\end{document}\n");
 
+}
+
+static void _generateResults(ComputedValue * values) {
+	if(values->next != NULL) {
+		_generateResults(values->next);
+	}
+	_output(0, "%s\n", values->result ? "true" : "false");
+	printf("%s\n", values->result ? "true" : "false");
 }
 
 /**

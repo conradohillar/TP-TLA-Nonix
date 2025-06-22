@@ -330,8 +330,7 @@ ComputationResult computeAdequateStatement(AdequateStatement *adequateStatement,
   // 1. Buscar el opset en la tabla de símbolos.
   SymbolEntry *symbol = find_symbol(symbolTable, adequateStatement->opsetName);
   if (symbol == NULL || symbol->type != SYMBOL_OPSET) {
-    logError(_logger, "Opset '%s' is not defined.",
-             adequateStatement->opsetName);
+    logError(_logger, "Opset '%s' is not defined.", adequateStatement->opsetName);
     return _invalidComputation();
   }
   OpsetList *opset = symbol->data.opset_list;
@@ -340,38 +339,37 @@ ComputationResult computeAdequateStatement(AdequateStatement *adequateStatement,
       .succeed = true, .value = isFunctionallyComplete(opset, symbolTable)};
 }
 
-ComputedValue *computeProgram(Program *program, SymbolEntry *symbolTable,
-                              boolean *isValidProgram) {
+ComputedValue *computeProgram(Program *program, SymbolEntry *symbolTable, boolean *isValidProgram) {
   ComputedValue *results_list = NULL;
 
   Program *currentProgram = program;
   while (currentProgram != NULL) {
     switch (currentProgram->statement->type) {
-    case EVALUATE_STATEMENT: {
-      ComputationResult result = computeEvaluateStatement(
-          currentProgram->statement->evaluateStatement, symbolTable);
-      if (!result.succeed) {
-        logError(_logger, "Failed to compute evaluate statement.");
-        *isValidProgram = false; // Mark the program as invalid.
-        return NULL;
+
+      case EVALUATE_STATEMENT: {
+        ComputationResult result = computeEvaluateStatement(currentProgram->statement->evaluateStatement, symbolTable);
+        if (!result.succeed) {
+          logError(_logger, "Failed to compute evaluate statement.");
+          *isValidProgram = false; // Mark the program as invalid.
+          return NULL;
+        }
+        results_list = _addResult(results_list, result.value);
+        break;
       }
-      results_list = _addResult(results_list, result.value);
-      break;
-    }
-    case ADEQUATE_STATEMENT: {
-      ComputationResult result = computeAdequateStatement(
-          currentProgram->statement->adequateStatement, symbolTable);
-      if (!result.succeed) {
-        logError(_logger, "Failed to compute adequate statement.");
-        *isValidProgram = false; // Mark the program as invalid.
-        return NULL;
+
+      case ADEQUATE_STATEMENT: {
+        ComputationResult result = computeAdequateStatement(currentProgram->statement->adequateStatement, symbolTable);
+        if (!result.succeed) {
+          logError(_logger, "Failed to compute adequate statement.");
+          *isValidProgram = false; // Mark the program as invalid.
+          return NULL;
+        }
+        results_list = _addResult(results_list, result.value);
+        break;
       }
-      results_list = _addResult(results_list, result.value);
-      break;
-    }
-    default:
-      break;
-    }
+      default:
+        break;
+      }
     currentProgram = currentProgram->next;
   }
   return results_list;

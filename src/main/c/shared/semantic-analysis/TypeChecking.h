@@ -42,9 +42,9 @@ unsigned int CheckTypeAdequateStatement(AdequateStatement *adequateStatement);
 
 unsigned int CheckTypeEvaluateStatement(EvaluateStatement *evaluateStatement);
 
-unsigned int CheckTypeTruthTable(TruthTable *truthTable, unsigned int args);
+unsigned int CheckTypeTruthTable(TruthValueMapEntry **truthValueMap, TruthTable *truthTable, unsigned int args);
 
-unsigned int CheckTypeTruthTableEntry(TruthTableEntry *truthTableEntry, unsigned int args);
+unsigned int CheckTypeTruthTableEntry(TruthValueMapEntry **truthValueMap, TruthTableEntry *truthTableEntry, unsigned int args);
 
 unsigned int CheckTypeTruthValueOrWildcard(TruthValueOrWildcard *truthValueOrWildcard);
 

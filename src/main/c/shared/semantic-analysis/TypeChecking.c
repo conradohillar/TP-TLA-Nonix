@@ -100,28 +100,34 @@ unsigned int CheckTypeDefineOperator(DefineOperator *defineOperator) {
     unsigned int args = list_size(defineOperator->customOperator->variableList);
     unsigned int table_entries = list_size(defineOperator->truthTable);
 
-    unsigned int valid = 0;
-    if (has_otherwise_entry(defineOperator->truthTable)){
-        valid = table_entries <= pow(2, args); // Si hay otherwise, que el número de entradas sea a lo sumo 2^n
-    } else {
-        valid = table_entries == pow(2, args); // Si no, que el número de entradas sea exactamente 2^n
+    unsigned int valid = 1;
+    if (table_entries > pow(2, args)){
+        return !valid; // El número de entradas debe ser a lo sumo 2^n
     }
 
-    return valid && CheckTypeTruthTable(defineOperator->truthTable, args);
+    TruthValueMapEntry *truthValueMap = NULL;
+    
+    valid = CheckTypeTruthTable(&truthValueMap, defineOperator->truthTable, args);
+
+    if(valid && !has_otherwise_entry(defineOperator->truthTable)) {
+        valid = size(truthValueMap) == pow(2, args); // Si no hay OTHERWISE, las combinaciones debe cubrir los 2^n casos
+    }
+    free_truth_value_map(&truthValueMap);
+    return valid;
 }
 
-unsigned int CheckTypeTruthTable(TruthTable *truthTable, unsigned int args) {
+unsigned int CheckTypeTruthTable(TruthValueMapEntry **truthValueMap, TruthTable *truthTable, unsigned int args) {
     if (truthTable == NULL) {
         return 0;
     }
     unsigned int result = 1;
     if (truthTable->next != NULL) {
-        result = CheckTypeTruthTable(truthTable->next, args);
+        result = CheckTypeTruthTable(truthValueMap, truthTable->next, args);
     }
-    return result && CheckTypeTruthTableEntry(truthTable->entry, args);
+    return result && CheckTypeTruthTableEntry(truthValueMap, truthTable->entry, args);
 }
 
-unsigned int CheckTypeTruthTableEntry(TruthTableEntry *truthTableEntry, unsigned int args) {
+unsigned int CheckTypeTruthTableEntry(TruthValueMapEntry **truthValueMap, TruthTableEntry *truthTableEntry, unsigned int args) {
     if (truthTableEntry == NULL) {
         return 0;
     }
@@ -130,7 +136,7 @@ unsigned int CheckTypeTruthTableEntry(TruthTableEntry *truthTableEntry, unsigned
             if(list_size(truthTableEntry->truthValueList) != args){
                 return 0;
             }
-            return check_truth_value_entry(&currentCompilerState()->truthValueMap, truthTableEntry->truthValueList, args);
+            return check_truth_value_entry(truthValueMap, truthTableEntry->truthValueList, args);
         }
         case OTHERWISE_ENTRY:
             return 1;

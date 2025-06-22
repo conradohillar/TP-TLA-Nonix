@@ -35,7 +35,9 @@ const int main(const int count, const char ** arguments) {
 		.succeed = false,
 		.result_values_list = NULL
 	};
+
 	const SyntacticAnalysisStatus syntacticAnalysisStatus = parse(&compilerState);
+
 	CompilationStatus compilationStatus = SUCCEED;
 	if (syntacticAnalysisStatus == ACCEPT) {
 		// ----------------------------------------------------------------------------------------
@@ -45,11 +47,6 @@ const int main(const int count, const char ** arguments) {
 		compilerState.result_values_list = computeProgram(program, compilerState.symbolTable, &compilerState.succeed);
 		if (compilerState.succeed) {
 			generate(&compilerState);
-			ComputedValue * currentValue = compilerState.result_values_list;
-			while(currentValue != NULL) {
-				printf("%s\n", currentValue->result ? "true" : "false");
-				currentValue = currentValue->next;
-			}
 		}
 		else {
 			logError(logger, "The computation phase rejects the input program.");
@@ -57,8 +54,6 @@ const int main(const int count, const char ** arguments) {
 		}
 		// ...end of the Backend. -----------------------------------------------------------------
 		// ----------------------------------------------------------------------------------------
-		logDebugging(logger, "Releasing AST resources...");
-		releaseProgram(compilerState.abstractSyntaxtTree);
 	}
 	else {
 		logError(logger, "The syntactic-analysis phase rejects the input program.");
@@ -66,6 +61,9 @@ const int main(const int count, const char ** arguments) {
 	}
 
 	// Release resources.
+	logDebugging(logger, "Releasing AST resources...");
+	releaseProgram(compilerState.abstractSyntaxtTree);
+	
 	if(compilerState.result_values_list != NULL) {
 		logDebugging(logger, "Releasing results list resources...");
 		free_results_list(compilerState.result_values_list);

@@ -23,9 +23,6 @@ typedef struct {
 	// Symbol Table
 	SymbolEntry * symbolTable;
 
-	// Truth Value Map for type checking.
-	TruthValueMapEntry * truthValueMap;
-
 	// A flag that indicates the current state of the compilation so far.
 	boolean succeed;
 
