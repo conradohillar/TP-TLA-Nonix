@@ -23,9 +23,18 @@ void shutdownNonixComputerModule();
  * The result of a computation. It's considered valid only if "succeed" is
  * true.
  */
+typedef enum {
+	EVALUATE_RESULT,
+	ADEQUATE_RESULT,
+} ResultType;
 
 typedef struct ComputedValue {
-	boolean result; 		
+	boolean result;
+	ResultType type; // Type of the result (evaluate or adequate)
+	union {
+		EvaluateStatement *evaluateStatement; // If the result is from an evaluate statement
+		AdequateStatement *adequateStatement; // If the result is from an adequate statement
+	};
 	struct ComputedValue *next;  
 } ComputedValue;
 

@@ -338,15 +338,26 @@ static void _generateEpilogue(ComputedValue * values) {
 
 
 static void _generateResults(ComputedValue *values) {
-    for (ComputedValue *curr = values; curr != NULL; curr = curr->next) {
-		if(curr->next == NULL){
-			_output(0, "%s", curr->result ? "true" : "false");
-		}
-		else {
-			_output(0, "%s \\\\\n", curr->result ? "true" : "false");  // salto de línea en LaTeX
-		}
-        printf("%s\n", curr->result ? "true" : "false");
-    }
+	if(values == NULL){
+		_output(0, "%s", "No results to display.\n");
+		return;
+	}
+	if(values->next != NULL) {
+		_generateResults(values->next);
+		_output(0, "%s", "\\\\\n");  // salto de línea en LaTeX
+	}
+	switch (values->type) {
+		case EVALUATE_RESULT:
+			_output(0, "evaluate(%s, %s) = ", values->evaluateStatement->formulaName, values->evaluateStatement->valuationName);
+			break;
+		case ADEQUATE_RESULT:
+			_output(0, "adequate(%s) = ", values->adequateStatement->opsetName);
+			break;
+		default:
+			break;
+	}
+	_output(0, "%s", values->result ? "true" : "false");
+    printf("%s\n", values->result ? "true" : "false");
 }
 
 

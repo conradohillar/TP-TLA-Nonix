@@ -24,7 +24,8 @@ computeTruthValueOrWildcard(const TruthValueOrWildcard *truthValueOrWildcard);
 static ComputationResult _invalidComputation();
 static ComputationResult _invalidOperator(const boolean leftExpression,
                                           const boolean rightExpression);
-static ComputedValue *_addResult(ComputedValue *list, boolean result);
+static ComputedValue *_addEvaluateResult(ComputedValue *list, boolean result, ResultType type, EvaluateStatement *evaluateStatement);
+static ComputedValue *_addAdequateResult(ComputedValue *list, boolean result, ResultType type, AdequateStatement *adequateStatement);
 
 /**
  * Converts and expression type to the proper binary operator. If that's not
@@ -60,7 +61,7 @@ static ComputationResult _invalidComputation() {
   return computationResult;
 }
 
-static ComputedValue *_addResult(ComputedValue *list, boolean result) {
+static ComputedValue *_addEvaluateResult(ComputedValue *list, boolean result, ResultType type, EvaluateStatement *evaluateStatement) {
   if (list == NULL) {
     // If the list is empty, create a new node.
     ComputedValue *newNode = (ComputedValue *)malloc(sizeof(ComputedValue));
@@ -69,10 +70,30 @@ static ComputedValue *_addResult(ComputedValue *list, boolean result) {
       return NULL;
     }
     newNode->result = result;
+    newNode->type = type;
+    newNode->evaluateStatement = evaluateStatement;
     newNode->next = NULL;
     return newNode;
   }
-  list->next = _addResult(list->next, result);
+  list->next = _addEvaluateResult(list->next, result, type, evaluateStatement);
+  return list;
+}
+
+static ComputedValue *_addAdequateResult(ComputedValue *list, boolean result, ResultType type, AdequateStatement *adequateStatement) {
+  if (list == NULL) {
+    // If the list is empty, create a new node.
+    ComputedValue *newNode = (ComputedValue *)malloc(sizeof(ComputedValue));
+    if (newNode == NULL) {
+      logError(_logger, "Memory allocation failed for ComputedValue.");
+      return NULL;
+    }
+    newNode->result = result;
+    newNode->type = type;
+    newNode->adequateStatement = adequateStatement;
+    newNode->next = NULL;
+    return newNode;
+  }
+  list->next = _addAdequateResult(list->next, result, type, adequateStatement);
   return list;
 }
 
@@ -366,7 +387,7 @@ ComputedValue *computeProgram(Program *program, SymbolEntry *symbolTable,
         *isValidProgram = false; // Mark the program as invalid.
         return NULL;
       }
-      results_list = _addResult(results_list, result.value);
+      results_list = _addEvaluateResult(results_list, result.value, EVALUATE_RESULT, currentProgram->statement->evaluateStatement);
       break;
     }
 
@@ -378,7 +399,7 @@ ComputedValue *computeProgram(Program *program, SymbolEntry *symbolTable,
         *isValidProgram = false; // Mark the program as invalid.
         return NULL;
       }
-      results_list = _addResult(results_list, result.value);
+      results_list = _addAdequateResult(results_list, result.value, ADEQUATE_RESULT, currentProgram->statement->adequateStatement);
       break;
     }
     default:
