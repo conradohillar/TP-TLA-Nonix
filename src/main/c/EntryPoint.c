@@ -61,9 +61,11 @@ const int main(const int count, const char ** arguments) {
 	}
 
 	// Release resources.
-	logDebugging(logger, "Releasing AST resources...");
-	releaseProgram(compilerState.abstractSyntaxtTree);
-	
+	if(compilerState.abstractSyntaxtTree != NULL) {
+		logDebugging(logger, "Releasing AST resources...");
+		releaseProgram(compilerState.abstractSyntaxtTree);
+	}
+
 	if(compilerState.result_values_list != NULL) {
 		logDebugging(logger, "Releasing results list resources...");
 		free_results_list(compilerState.result_values_list);

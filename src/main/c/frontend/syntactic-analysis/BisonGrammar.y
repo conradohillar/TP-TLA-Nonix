@@ -47,7 +47,7 @@
  * @see https://www.gnu.org/software/bison/manual/html_node/Destructor-Decl.html
  */
 
-/*
+/* 
 %destructor { releaseProgram($$); } <program>
 %destructor { releaseStatement($$); } <statement>
 
@@ -82,7 +82,7 @@
 %destructor { releaseTruthValueOrWildcard($$); } <truthValueOrWildcard>
 %destructor { releaseTruthValue($$); } <truthValue> */
 
-// %destructor { free((void*)$$);} <keywordOrSymbol> 
+//%destructor { free((void*)$$);} <keywordOrSymbol> 
 
 
 /** Terminals. */

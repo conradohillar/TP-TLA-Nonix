@@ -337,6 +337,9 @@ static void _generateEpilogue(ComputedValue * values) {
 }
 
 static void _generateResults(ComputedValue * values) {
+	if(values == NULL) {
+		return;
+	}
 	if(values->next != NULL) {
 		_generateResults(values->next);
 	}
