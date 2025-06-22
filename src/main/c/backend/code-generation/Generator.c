@@ -336,16 +336,19 @@ static void _generateEpilogue(ComputedValue * values) {
 
 }
 
-static void _generateResults(ComputedValue * values) {
-	if(values == NULL) {
-		return;
-	}
-	if(values->next != NULL) {
-		_generateResults(values->next);
-	}
-	_output(0, "%s\n", values->result ? "true" : "false");
-	printf("%s\n", values->result ? "true" : "false");
+
+static void _generateResults(ComputedValue *values) {
+    for (ComputedValue *curr = values; curr != NULL; curr = curr->next) {
+		if(curr->next == NULL){
+			_output(0, "%s", curr->result ? "true" : "false");
+		}
+		else {
+			_output(0, "%s \\\\\n", curr->result ? "true" : "false");  // salto de línea en LaTeX
+		}
+        printf("%s\n", curr->result ? "true" : "false");
+    }
 }
+
 
 /**
  * Generates an indentation string for the specified level.
