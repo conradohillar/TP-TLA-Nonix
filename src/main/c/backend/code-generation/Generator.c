@@ -344,14 +344,17 @@ static void _generateResults(ComputedValue *values) {
 	}
 	if(values->next != NULL) {
 		_generateResults(values->next);
-		_output(0, "%s", "\\\\\n"); 
+		_output(0, "%s", "\\\\\n");
+		printf("\n"); 
 	}
 	switch (values->type) {
 		case EVALUATE_RESULT:
 			_output(0, "evaluate(%s, %s) = ", values->evaluateStatement->formulaName, values->evaluateStatement->valuationName);
+			printf("evaluate(%s, %s) = ", values->evaluateStatement->formulaName, values->evaluateStatement->valuationName);
 			break;
 		case ADEQUATE_RESULT:
 			_output(0, "adequate(%s) = ", values->adequateStatement->opsetName);
+			printf("adequate(%s) = ", values->adequateStatement->opsetName);
 			break;
 		default:
 			break;
