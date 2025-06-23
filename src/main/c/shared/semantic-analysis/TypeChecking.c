@@ -102,7 +102,7 @@ unsigned int CheckTypeDefineOperator(DefineOperator *defineOperator) {
 
     unsigned int valid = 1;
     if (table_entries > pow(2, args)){
-        return !valid; // El número de entradas debe ser a lo sumo 2^n
+        return !valid; // Number of entries must be at most 2^n
     }
 
     TruthValueMapEntry *truthValueMap = NULL;
@@ -110,7 +110,7 @@ unsigned int CheckTypeDefineOperator(DefineOperator *defineOperator) {
     valid = CheckTypeTruthTable(&truthValueMap, defineOperator->truthTable, args);
 
     if(valid && !has_otherwise_entry(defineOperator->truthTable)) {
-        valid = size(truthValueMap) == pow(2, args); // Si no hay OTHERWISE, las combinaciones debe cubrir los 2^n casos
+        valid = size(truthValueMap) == pow(2, args); // If there is no OTHERWISE, combinations must cover all 2^n cases
     }
     free_truth_value_map(&truthValueMap);
     return valid;
@@ -151,7 +151,7 @@ unsigned int CheckTypeDefineVariable(DefineVariable *defineVariable) {
 
 unsigned int CheckTypeVariableList(VariableList *variableList) {
     unsigned int result = 1;
-    if (variableList->next != NULL) { // Si el análisis sintáctico fue exitoso, no debería ser null el primer elemento de la lista
+    if (variableList->next != NULL) { // If sintax analysis was successful, the first element of the list should not be null
         result = CheckTypeVariableList(variableList->next);
     }
     return result && CheckTypeVariable(variableList->variable);
@@ -163,7 +163,7 @@ unsigned int CheckTypeDefineValuation(DefineValuation *defineValuation) {
 
 unsigned int CheckTypeValuationList(ValuationList *valuationList) {
     unsigned int result = 1;
-    if (valuationList->next != NULL) { // Si el análisis sintático fue exitoso, no debería ser null el primer elemento de la lista
+    if (valuationList->next != NULL) { // If syntactic analysis was successful, the first element of the list should not be null
         result = CheckTypeValuationList(valuationList->next);
     }
     return result && CheckTypeValuation(valuationList->valuation);
@@ -182,10 +182,10 @@ unsigned int CheckTypeDefineOpset(DefineOpset *defineOpset) {
 
 unsigned int CheckTypeOpsetList(OpsetList *opsetList) {
     unsigned int result = 1;
-    if (opsetList->next != NULL) { // Si el análisis sintáctico fue exitoso, no debería ser null el primer elemento de la lista
+    if (opsetList->next != NULL) { // If syntactic analysis was successful, the first element of the list should not be null
         result = CheckTypeOpsetList(opsetList->next);
     }
-    return result && CheckTypeOperator(opsetList->operator, -1); // No interesa el número de argumentos
+    return result && CheckTypeOperator(opsetList->operator, -1); // Number of arguments is not relevant
 }
 
 unsigned int CheckTypeAdequateStatement(AdequateStatement *adequateStatement) {
@@ -222,7 +222,7 @@ unsigned int CheckTypeOperator(Operator operatorName, int count) {
             || strcmp(operatorName, "<=>") == 0
             || strcmp(operatorName, "!") == 0;
     }
-    return symbolEntry->type == SYMBOL_OPERATOR && ((count < 0) ? 1 : (symbolEntry->data.operator_data.argc == count)); // Decisión de diseño: si el count es -1, no se verifica el número de argumentos
+    return symbolEntry->type == SYMBOL_OPERATOR && ((count < 0) ? 1 : (symbolEntry->data.operator_data.argc == count)); // Design decision: if count is -1, do not check the number of arguments
 }
 
 unsigned int CheckTypeValuationName(const char * valuationName) {

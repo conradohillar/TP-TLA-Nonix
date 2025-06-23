@@ -197,10 +197,10 @@ struct TruthTable {
 
 struct TruthTableEntry {
 	union {
-		struct {
+		struct {	// TRUTH_VALUE_LIST
 			TruthValueList * truthValueList;
 			TruthValue * mapValue; // Boolean to which the truth values list is mapped.
-		}; // TRUTH_VALUE_LIST
+		}; 
 		TruthValue * otherwiseValue; // OTHERWISE
 	};
 	TruthTableEntryType type;

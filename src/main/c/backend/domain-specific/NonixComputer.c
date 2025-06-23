@@ -219,12 +219,11 @@ ComputationResult computeTruthTable(TruthTable *truthTable,
                                     SymbolEntry *symbolTable) {
   int num_vars_in_operator = list_size(variableList);
 
-  // Array temporal para los valores de verdad de las variables de la instancia
-  // del operador.
+  // Temporary array to store the truth values of the variables in the operator.
+  // This is used to compare against the truth table entries.
   boolean operator_var_truth_values[num_vars_in_operator];
 
-  // Se recorre la variableList y se obtienen los valores de verdad de la tabla
-  // de símbolos.
+  // Traverse the variableList and obtain the truth values from the symbol table.
   VariableList *current_var_node = variableList;
   for (int i = 0; i < num_vars_in_operator && current_var_node != NULL; ++i) {
     SymbolEntry *symbol = find_symbol(symbolTable, current_var_node->variable);
@@ -240,7 +239,7 @@ ComputationResult computeTruthTable(TruthTable *truthTable,
   ComputationResult result = computeTruthTableFromTruthValueArray(
       truthTable, operator_var_truth_values, num_vars_in_operator);
 
-  // Si no se encontró ninguna fila que coincida.
+  // If no matching row was found.
   if (!result.succeed) {
     logError(
         _logger,
@@ -256,13 +255,12 @@ ComputationResult computeTruthTableFromTruthValueArray(TruthTable *truthTable,
                                                        int varCount) {
   ComputationResult result = {.succeed = false, .value = false};
 
-  // Se recorre cada entrada de la truthTable.
+  // Traverse each entry in the truthTable.
   TruthTable *current_row = truthTable;
   while (current_row != NULL) {
     switch (current_row->entry->type) {
     case TRUTH_VALUE_LIST: {
-      // Se comparan los valores de verdad de la entrada actual con los del
-      // truthValueArray.
+      // Compare the truth values of the current entry with those in the truthValueArray
       boolean match = true;
       TruthValueList *entry_val_node = current_row->entry->truthValueList;
       for (int i = 0; i < varCount; ++i) {
@@ -274,18 +272,17 @@ ComputationResult computeTruthTableFromTruthValueArray(TruthTable *truthTable,
         entry_val_node = entry_val_node->next;
       }
 
-      if (match) { // Se encontró la fila que coincide.
+      if (match) { // Found matching row.
         result.succeed = true;
         result.value =
             current_row->entry->mapValue
-                ->value; // Asignar el valor de verdad correspondiente.
+                ->value; // Assign corresponding truth value.
         return result;
       }
       break;
     }
     case OTHERWISE_ENTRY: {
-      // Si es OTHERWISE, se guarda su valor en caso de que haya otra entrada
-      // más específica.
+      // If it's OTHERWISE, save its value in case there's another entry that is more specific
       result.succeed = true;
       result.value = current_row->entry->otherwiseValue->value;
       break;
@@ -295,7 +292,7 @@ ComputationResult computeTruthTableFromTruthValueArray(TruthTable *truthTable,
                current_row->entry->type);
       return _invalidComputation();
     }
-    // Avanzar a la siguiente fila de la truthTable.
+    // Move to the next row in the truthTable.
     current_row = current_row->next;
   }
   return result;
@@ -320,7 +317,7 @@ computeTruthValueOrWildcard(const TruthValueOrWildcard *truthValueOrWildcard) {
 
 ComputationResult computeEvaluateStatement(EvaluateStatement *evaluateStatement,
                                            SymbolEntry *symbolTable) {
-  // 1. Buscar la valuación en la tabla de símbolos.
+  // Search the valuation in the symbol table.
   SymbolEntry *symbol =
       find_symbol(symbolTable, evaluateStatement->valuationName);
   if (symbol == NULL || symbol->type != SYMBOL_VALUATION) {
@@ -329,7 +326,7 @@ ComputationResult computeEvaluateStatement(EvaluateStatement *evaluateStatement,
     return _invalidComputation();
   }
 
-  // 2. Actualizar los valores de verdad de las variables según la valuación.
+  // Update the truth values of the variables according to the valuation.
   ValuationList *current_valuation = symbol->data.valuation_list;
   while (current_valuation != NULL) {
     if (!update_variable_truth_value(
@@ -343,7 +340,7 @@ ComputationResult computeEvaluateStatement(EvaluateStatement *evaluateStatement,
     current_valuation = current_valuation->next;
   }
 
-  // 3. Buscar la fórmula en la tabla de símbolos.
+  // Search the formula in the symbol table.
   symbol = find_symbol(symbolTable, evaluateStatement->formulaName);
   if (symbol == NULL || symbol->type != SYMBOL_FORMULA) {
     logError(_logger, "Formula '%s' is not defined.",
@@ -351,14 +348,14 @@ ComputationResult computeEvaluateStatement(EvaluateStatement *evaluateStatement,
     return _invalidComputation();
   }
 
-  // 4. Calcular el resultado de la expresión asociada a la fórmula,
-  // correspondiente a los valores de la valuación.
+  // Calculate the result of the expression associated with the formula,
+  // corresponding to the values of the valuation.
   return computeExpression(symbol->data.expression_node, symbolTable);
 }
 
 ComputationResult computeAdequateStatement(AdequateStatement *adequateStatement,
                                            SymbolEntry *symbolTable) {
-  // 1. Buscar el opset en la tabla de símbolos.
+  // Search the opset in the symbol table.
   SymbolEntry *symbol = find_symbol(symbolTable, adequateStatement->opsetName);
   if (symbol == NULL || symbol->type != SYMBOL_OPSET) {
     logError(_logger, "Opset '%s' is not defined.",

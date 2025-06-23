@@ -4,7 +4,7 @@ static void truth_value_list_to_keys(const TruthValueList *list, unsigned long l
 
 static void truth_value_list_to_keys(const TruthValueList *list, unsigned long long key_prefix, int bit_pos, unsigned long long *out_keys, int *out_count, unsigned int max_keys) {
     if (list == NULL) {
-        // Caso base: se llegó al final de la lista, guardar la clave generada
+        // Reached the end of the list, save the generated key
         if (*out_count < max_keys) {
             out_keys[*out_count] = key_prefix;
             (*out_count)++;
@@ -12,9 +12,9 @@ static void truth_value_list_to_keys(const TruthValueList *list, unsigned long l
         return;
     }
     if (list->truthValueOrWildcard->type == WILDCARD_VALUE) {
-        // Probar con 0 (false)
+        // Expand with 0 (false)
         truth_value_list_to_keys(list->next, key_prefix, bit_pos + 1, out_keys, out_count, max_keys);
-        // Probar con 1 (true)
+        // Expand with 1 (true)
         truth_value_list_to_keys(list->next, key_prefix | (1ULL << bit_pos), bit_pos + 1, out_keys, out_count, max_keys);
     } else {
         int bit = list->truthValueOrWildcard->truthValue->value ? 1 : 0;
@@ -25,7 +25,7 @@ static void truth_value_list_to_keys(const TruthValueList *list, unsigned long l
 /* PUBLIC FUNCTIONS */
 boolean check_truth_value_entry(TruthValueMapEntry **truthValueMap, TruthValueList *truthValueList, unsigned int n_vars) {
     if (truthValueList == NULL) {
-        return false; // No hay entradas que verificar
+        return false; 
     }
     unsigned int max_keys = 1 << n_vars; // 2^n_vars
     unsigned long long *keys = malloc(max_keys * sizeof(unsigned long long));
@@ -35,7 +35,7 @@ boolean check_truth_value_entry(TruthValueMapEntry **truthValueMap, TruthValueLi
     for(int i = 0; i < count; i++) {
         if (!insert_combination(truthValueMap, keys[i])) {
             free(keys);
-            return false; // Combinación inválida
+            return false;  // Invalid entry, already exists
         }
     }
     free(keys);

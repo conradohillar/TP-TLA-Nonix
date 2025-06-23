@@ -1,6 +1,6 @@
 #include "SymbolTable.h"
-#include <string.h> // Para strdup y strlen
-#include <stdlib.h> // Para malloc y free
+#include <string.h> 
+#include <stdlib.h> 
 
 boolean insert_symbol(SymbolEntry **table, const char *name_param, int argc_or_truth_value, void *data_node, SymbolType type) {
 
@@ -13,20 +13,20 @@ boolean insert_symbol(SymbolEntry **table, const char *name_param, int argc_or_t
   s->type = type;
   switch (type) {
     case SYMBOL_OPERATOR:
-      s->data.operator_data.argc = argc_or_truth_value; // Número de argumentos
-      s->data.operator_data.truth_table = (TruthTable*)data_node; // Tabla de verdad
+      s->data.operator_data.argc = argc_or_truth_value; 
+      s->data.operator_data.truth_table = (TruthTable*)data_node; 
       break;
     case SYMBOL_VARIABLE:
-      s->data.truth_value = (boolean)argc_or_truth_value; // Valor de verdad
+      s->data.truth_value = (boolean)argc_or_truth_value; 
       break;
     case SYMBOL_FORMULA:
-      s->data.expression_node = (Expression*)data_node; // Nodo de expresión AST
+      s->data.expression_node = (Expression*)data_node; 
       break;
     case SYMBOL_VALUATION:
-      s->data.valuation_list = (ValuationList*)data_node; // Lista de valuaciones
+      s->data.valuation_list = (ValuationList*)data_node; 
       break;
     case SYMBOL_OPSET:
-      s->data.opset_list = (OpsetList*)data_node; // Lista de operadores
+      s->data.opset_list = (OpsetList*)data_node; 
       break;
   }
 
@@ -57,16 +57,16 @@ boolean update_data_node(SymbolEntry *table, const char *name, void *new_data_no
   }
   switch(s->type) {
     case SYMBOL_FORMULA:
-      s->data.expression_node = (Expression*)new_data_node; // Actualizar nodo de expresión AST
+      s->data.expression_node = (Expression*)new_data_node; 
       break;
     case SYMBOL_VALUATION:
-      s->data.valuation_list = (ValuationList*)new_data_node; // Actualizar lista de valuaciones
+      s->data.valuation_list = (ValuationList*)new_data_node;
       break;
     case SYMBOL_OPSET:
-      s->data.opset_list = (OpsetList*)new_data_node; // Actualizar lista de operadores
+      s->data.opset_list = (OpsetList*)new_data_node;
       break;
     default:
-      return false; // No se puede actualizar para otros tipos
+      return false; 
   }
   return true;
 }
@@ -76,7 +76,7 @@ void free_symbol_table(SymbolEntry **table) {
   HASH_ITER(hh, *table, s, tmp) {
     HASH_DEL(*table, s); 
     if (s->name) {
-      free((void *)s->name); // Liberar la copia del nombre que hizo la tabla
+      free((void *)s->name); 
     }
     free(s); 
   }

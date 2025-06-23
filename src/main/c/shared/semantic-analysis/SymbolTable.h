@@ -19,13 +19,13 @@ typedef struct SymbolEntry {
   UT_hash_handle hh;
   union {
     struct {
-      int argc;                 // For SYMBOL_OPERATOR, number of arguments
-      TruthTable *truth_table;  // For SYMBOL_OPERATOR, truth table
+      int argc;                     // For SYMBOL_OPERATOR, number of arguments
+      TruthTable *truth_table;      // For SYMBOL_OPERATOR, truth table
     } operator_data;
-    boolean truth_value;      // For SYMBOL_VARIABLE, the truth value
-    Expression *expression_node; // For SYMBOL_FORMULA, expression node
-    ValuationList *valuation_list; // For SYMBOL_VALUATION, valuation list
-    OpsetList *opset_list;       // For SYMBOL_OPSET, opset list
+    boolean truth_value;            // For SYMBOL_VARIABLE, the truth value
+    Expression *expression_node;    // For SYMBOL_FORMULA, expression node
+    ValuationList *valuation_list;  // For SYMBOL_VALUATION, valuation list
+    OpsetList *opset_list;          // For SYMBOL_OPSET, opset list
   } data;
 } SymbolEntry;
 

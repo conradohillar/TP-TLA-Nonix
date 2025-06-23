@@ -7,7 +7,7 @@
 
 typedef struct TruthValueMapEntry {
     unsigned long long combination; // Unique key for the truth value combination
-    UT_hash_handle hh; // For hash table handling
+    UT_hash_handle hh;              // For hash table handling
 } TruthValueMapEntry;
 
 // Functions to manage the table

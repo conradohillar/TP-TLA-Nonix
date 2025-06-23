@@ -9,7 +9,7 @@ static FILE * _outputFile = NULL;
 
 void initializeGeneratorModule() {
 	_logger = createLogger("Generator");
-	_outputFile = fopen("output.tex", "w"); // o cualquier nombre
+	_outputFile = fopen("output.tex", "w");
 	if (_outputFile == NULL) {
 		logError(_logger, "Cannot open output file");
 		exit(1);
@@ -344,7 +344,7 @@ static void _generateResults(ComputedValue *values) {
 	}
 	if(values->next != NULL) {
 		_generateResults(values->next);
-		_output(0, "%s", "\\\\\n");  // salto de línea en LaTeX
+		_output(0, "%s", "\\\\\n"); 
 	}
 	switch (values->type) {
 		case EVALUATE_RESULT:

@@ -4,7 +4,7 @@
 
 static boolean *bitMaskToBooleanArray(long long int bitMask, int varCount) {
   if (varCount > 64) {
-    // TODO: Too many variables error
+    // Too many variables error
     return NULL;
   }
   boolean *truthValueArray = malloc(varCount * sizeof(boolean));
@@ -220,7 +220,6 @@ boolean isType3(TruthTable *truthTable, SymbolEntry *symbolTable,
         truthTable, truthValueArray, varCount);
     if (!result.succeed) {
       free(maxTruthValueArray);
-      // TODO: Error
       return false;
     }
     int ones = count_ones(bitMaskTruthArray);
@@ -280,7 +279,6 @@ boolean isType4(TruthTable *truthTable, SymbolEntry *symbolTable,
           truthTable, truthValueArray, varCount);
       if (!result.succeed) {
         free(truthValueArray);
-        // TODO: Error
         return false;
       }
       // If the calculated value is greater than the previous one, then the
